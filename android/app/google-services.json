@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "670324928036",
+    "project_id": "novev5",
+    "storage_bucket": "novev5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670324928036:android:b86c8d65b573c67a1d32b1",
+        "android_client_info": {
+          "package_name": "com.example.nove_5"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMduEQ0J0-7qkAjRRuD2FhHqD6ESr74Q0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
