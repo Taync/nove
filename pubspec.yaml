@@ -41,6 +41,8 @@ dependencies:
   firebase_auth: ^5.5.1
   firebase_ui_auth: ^1.16.1
   firebase_ui_oauth_google: ^1.4.1
+  google_sign_in: ^6.3.0
+  flutter_native_splash: ^2.4.5
 
 dev_dependencies:
   flutter_test:
@@ -65,7 +67,7 @@ flutter:
   uses-material-design: true
 
   assets:
-  - Assets/ 
+  - Assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
@@ -92,3 +94,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/splash_image.png
+  android: true
+  ios: true
+  fullscreen: true
