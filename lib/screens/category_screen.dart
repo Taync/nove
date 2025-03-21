@@ -11,7 +11,7 @@ class CategoryScreen extends StatelessWidget {
       appBar: AppBar(title: Text(categoryName)),
       body: Center(
         child: Text(
-          "Ürünler bu kategoriye göre listelenecek: $categoryName",
+          "Category Coming SOON...: $categoryName",
           style: TextStyle(fontSize: 18),
         ),
       ),
