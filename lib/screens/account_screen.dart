@@ -11,10 +11,10 @@ class AccountScreen extends StatelessWidget {
           children: [
             SizedBox(height: 10),  // Adds spacing between the text and button
             OutlinedButton(
-              child: Text("Logout"),
+              child: Text("Logout."),
               onPressed: () async {
               await FirebaseAuth.instance.signOut();
-               Navigator.pushReplacementNamed(context, '/'); 
+               Navigator.pushReplacementNamed(context, '/'); //logout yapar
               }, 
             ),
           ],
