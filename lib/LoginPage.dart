@@ -1,6 +1,6 @@
-// ignore: file_names
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
 
 import 'home.dart';
@@ -15,7 +15,9 @@ class AuthGate extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return SignInScreen(
-            providers: [EmailAuthProvider()],
+            providers: [
+              EmailAuthProvider(),
+            ],
             headerBuilder: (context, constraints, shrinkOffset) {
               return Padding(
                 padding: const EdgeInsets.all(20),
@@ -28,18 +30,27 @@ class AuthGate extends StatelessWidget {
             subtitleBuilder: (context, action) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child:
-                    action == AuthAction.signIn
-                        ? const Text('Welcome to Nove, please sign in!')
-                        : const Text('Welcome to Nove, please sign up!'),
+                child: action == AuthAction.signIn
+                    ? const Text('Welcome to Nove, please sign in!')
+                    : const Text('Welcome to Nove, please sign up!'),
               );
             },
-            footerBuilder: (context, action) {
-              return const Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text('', style: TextStyle(color: Colors.grey)),
-              );
-            },
+           footerBuilder: (context, action) {
+  return Padding(
+    padding: const EdgeInsets.only(top: 16),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          'By signing in, you agree to our Terms and Conditions.',
+          style: TextStyle(color: Colors.grey),
+        ),
+        const GoogleSignInButton(loadingIndicator: Text('Loading'), clientId: 'Assets/NoveLogo.jpg' ),
+        
+      ],
+    ),
+  );
+},
             sideBuilder: (context, shrinkOffset) {
               return Padding(
                 padding: const EdgeInsets.all(20),
