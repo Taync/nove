@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final List<String> imagePaths; // Birden fazla resim
+  final String imagePath;
   final String productName;
   final String price;
   final String description;
-  final String brand;
 
   ProductDetailScreen({
-    required this.imagePaths,
+    required this.imagePath,
     required this.productName,
     required this.price,
     required this.description,
-    required this.brand,
   });
 
   @override
@@ -20,8 +18,6 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  int _currentIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +25,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         title: Text(widget.productName),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
+        centerTitle: true,
         titleTextStyle: TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
@@ -37,101 +33,64 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
       ),
       body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // PageView ile resimleri kaydırma
-            Container(
-              height: 450,
-              width: double.infinity,
-              child: PageView.builder(
-                itemCount: widget.imagePaths.length,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentIndex =
-                        index; // Kaydırıldığında resmin index'ini güncelliyoruz
-                  });
-                },
-                itemBuilder: (context, index) {
-                  return Image.asset(
-                    widget.imagePaths[index],
-                    fit: BoxFit.fill,
+            // Ürün Resmi
+            Center(
+              child: Image.asset(
+                widget.imagePath, // Sabit resim yerine değişken kullanıldı
+                height: 300,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(height: 20),
+
+            // Ürün Adı
+            Text(
+              widget.productName, // Sabit isim yerine değişken
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+
+            // Ürün Fiyatı
+            Text(
+              "\$${widget.price}", // Sabit fiyat yerine değişken
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+
+            // Ürün Açıklaması
+            Text(
+              widget.description, // Açıklamayı dinamik hale getirildi
+              style: TextStyle(fontSize: 16),
+            ),
+
+            SizedBox(height: 20),
+
+            // Sepete Ekle Butonu
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("${widget.productName} sepete eklendi!"),
+                    ),
                   );
                 },
-              ),
-            ),
-
-            // altındaki noktalar
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                widget.imagePaths.length,
-                (index) => Container(
-                  margin: EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentIndex == index ? 12 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _currentIndex == index ? Colors.black : Colors.grey,
-                  ),
+                icon: Icon(Icons.add_shopping_cart),
+                label: Text("Sepete Ekle"),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  textStyle: TextStyle(fontSize: 16),
+                  backgroundColor: Colors.orange,
                 ),
-              ),
-            ),
-            SizedBox(height: 10),
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                widget.brand,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-
-            SizedBox(height: 10),
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.productName,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "\$${widget.price}",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: const Color.fromARGB(255, 0, 0, 0),
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    widget.description,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: const Color.fromARGB(255, 58, 57, 57),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("${widget.productName} Added to Cart!"),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 164, 202, 230),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 50,
-                        vertical: 15,
-                      ),
-                    ),
-                    child: Text("Add to Cart"),
-                  ),
-                ],
               ),
             ),
           ],
