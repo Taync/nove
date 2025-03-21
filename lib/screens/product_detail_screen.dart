@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends StatefulWidget {
   final String imagePath;
   final String productName;
   final String price;
@@ -14,10 +14,15 @@ class ProductDetailScreen extends StatelessWidget {
   });
 
   @override
+  _ProductDetailScreenState createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(productName),
+        title: Text(widget.productName),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
@@ -27,25 +32,32 @@ class ProductDetailScreen extends StatelessWidget {
           fontSize: 20,
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Ürün Resmi
-            Center(child: Image.asset(imagePath, height: 250)),
+            Center(
+              child: Image.asset(
+                widget.imagePath, // Sabit resim yerine değişken kullanıldı
+                height: 300,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
             SizedBox(height: 20),
 
             // Ürün Adı
             Text(
-              productName,
+              widget.productName, // Sabit isim yerine değişken
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
 
             // Ürün Fiyatı
             Text(
-              "\$$price",
+              "\$${widget.price}", // Sabit fiyat yerine değişken
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.green,
@@ -55,7 +67,10 @@ class ProductDetailScreen extends StatelessWidget {
             SizedBox(height: 10),
 
             // Ürün Açıklaması
-            Text(description, style: TextStyle(fontSize: 16)),
+            Text(
+              widget.description, // Açıklamayı dinamik hale getirildi
+              style: TextStyle(fontSize: 16),
+            ),
 
             SizedBox(height: 20),
 
@@ -64,7 +79,9 @@ class ProductDetailScreen extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("$productName sepete eklendi!")),
+                    SnackBar(
+                      content: Text("${widget.productName} sepete eklendi!"),
+                    ),
                   );
                 },
                 icon: Icon(Icons.add_shopping_cart),

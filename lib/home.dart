@@ -274,8 +274,7 @@ class ProductHorizontalList extends StatelessWidget {
                         imagePath: products[index]["image"]!,
                         productName: products[index]["name"]!,
                         price: products[index]["price"]!,
-                        description:
-                            "High-quality and fresh ${products[index]["name"]} from organic farms.",
+                        description: "${products[index]["name"]}.",
                       ),
                 ),
               );
@@ -349,8 +348,67 @@ class ProductDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(productName)),
-      body: Center(child: Text("Product Detail Page for $productName")),
+      appBar: AppBar(
+        title: Text(productName),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.black),
+        titleTextStyle: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(imagePath, width: double.infinity, fit: BoxFit.cover),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    productName,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "\$$price",
+                    style: TextStyle(fontSize: 20, color: Colors.green),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    description,
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("${productName} Added To Cart!"),
+                        ),
+                      );
+                      // Sepete ekleme işlemi buraya gelebilir
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 15,
+                      ),
+                    ),
+                    child: Text("Add to Cart"),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
