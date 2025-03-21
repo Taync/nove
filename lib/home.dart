@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nove_5/screens/account_screen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/category_screen.dart';
-import 'package:nove_5/screens/favourites_screen.dart';
-import 'package:nove_5/screens/product_detail_screen.dart';
+import 'package:nove_5/screens/favourite_screen.dart';
 import 'package:nove_5/splash_screen.dart';
 
 void main() {
@@ -243,69 +242,45 @@ class _BannerCarouselState extends State<BannerCarousel> {
 }
 
 class ProductHorizontalList extends StatelessWidget {
-  final List<Map<String, dynamic>> products = [
+  final List<Map<String, String>> products = [
     {
-      "brand": "Jordan",
       "image": "Assets/j1chicago.jpg",
       "name": "Air Jordan 1 Retro Chicago",
       "price": "1.149",
-      "description": "Air Jordan 1 Retro High OG Chicago sneakers.",
-      "imagePaths": [
-        "Assets/j1chicago2.jpg",
-        "Assets/j1chicago6.jpg",
-        "Assets/j1chicago4.jpg",
-        "Assets/j1chicago3.jpg",
-      ], // Resim listesi
     },
     {
-      "brand": "Dior",
       "image": "Assets/diorcoat.jpg",
       "name": "DiorAlps Waterproof Hooded Jacket",
       "price": "1.105",
-      "description":
-          "White Technical Taffeta Jacquard with Gold-Tone Dior Oblique Motif",
-      "imagePaths": ["Assets/diorcoat.jpg", "Assets/diorcoat2.jpg"],
     },
-    {
-      "brand": "Prada",
-      "image": "Assets/prada5.jpg",
-      "name": "Prada half-zip Polo Shirt Blue ",
-      "price": "775",
-      "description":
-          "It is through minimalist designs that Prada showcases a seamless fusion of classic and modern.",
-      "imagePaths": ["Assets/prada5.jpg", "Assets/prada6.jpg"],
-    },
+    {"image": "Assets/prada5.jpg", "name": "Piqué polo shirt", "price": "775"},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 250, // yükseklik
+      height: 250, // Yükseklik belirleme
       child: ListView.builder(
-        scrollDirection: Axis.horizontal, // yatay kayma
+        scrollDirection: Axis.horizontal, // Yatay kaydırma
         itemCount: products.length,
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              // tıkla productds git
-              Navigator.push<dynamic>(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder:
                       (context) => ProductDetailScreen(
-                        imagePaths: List<String>.from(
-                          products[index]["imagePaths"],
-                        ),
+                        imagePath: products[index]["image"]!,
                         productName: products[index]["name"]!,
                         price: products[index]["price"]!,
-                        description: products[index]["description"]!,
-                        brand: products[index]["brand"]!,
+                        description: "${products[index]["name"]}.",
                       ),
                 ),
               );
             },
             child: Container(
-              width: 180, //  genişlik
+              width: 180, // Kart genişliği
               margin: EdgeInsets.symmetric(horizontal: 8),
               child: Card(
                 shape: RoundedRectangleBorder(
@@ -339,7 +314,7 @@ class ProductHorizontalList extends StatelessWidget {
                           Text(
                             "\$${products[index]["price"]!}",
                             style: TextStyle(
-                              color: const Color.fromARGB(255, 0, 0, 0),
+                              color: Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -352,6 +327,87 @@ class ProductHorizontalList extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class ProductDetailScreen extends StatelessWidget {
+  final String imagePath;
+  final String productName;
+  final String price;
+  final String description;
+
+  ProductDetailScreen({
+    required this.imagePath,
+    required this.productName,
+    required this.price,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(productName),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.black),
+        titleTextStyle: TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(imagePath, width: double.infinity, fit: BoxFit.cover),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    productName,
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "\$$price",
+                    style: TextStyle(fontSize: 20, color: Colors.green),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    description,
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("${productName} Added To Cart!"),
+                        ),
+                      );
+                      // Sepete ekleme işlemi buraya gelebilir
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 15,
+                      ),
+                    ),
+                    child: Text("Add to Cart"),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
