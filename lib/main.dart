@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:nove_5/Admin/AddProduct.dart';
 import 'package:nove_5/firebase_options.dart';
 import 'loginpage.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const AuthGate(),
+      home: const AuthGate(), //AddProduct olarak değiştirerek admin ürün eklemeye geçebilirsin
     );
   }
 }
