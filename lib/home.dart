@@ -1,15 +1,27 @@
+import 'dart:convert';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nove_5/firebase_options.dart';
 import 'package:nove_5/screens/account_screen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/category_screen.dart';
-import 'package:nove_5/screens/favourite_screen.dart';
+import 'package:nove_5/screens/favourites_screen.dart';
+import 'package:nove_5/screens/product_detail_screen.dart';
 import 'package:nove_5/splash_screen.dart';
+import 'dart:async';
 
-void main() {
+Future<void> main() async {
   runApp(MyApp());
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
+
 }
 
 class MyApp extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen());
@@ -176,6 +188,9 @@ class BannerCarousel extends StatefulWidget {
 
 class _BannerCarouselState extends State<BannerCarousel> {
   int _currentIndex = 0;
+  Timer? _timer;
+  late PageController _pageController;
+
   final List<Map<String, String>> banners = [
     {"image": "Assets/nike2.jpg", "category": "Nike"},
     {"image": "Assets/dior.jpg", "category": "Dior"},
@@ -186,12 +201,38 @@ class _BannerCarouselState extends State<BannerCarousel> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
+    _timer = Timer.periodic(Duration(seconds: 7), (Timer timer) {
+      if (_currentIndex < banners.length - 1) {
+        _currentIndex++;
+      } else {
+        _currentIndex = 0;
+      }
+      _pageController.animateToPage(
+        _currentIndex,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
-          height: 380,
+          height: 333,
           child: PageView.builder(
+            controller: _pageController,
             itemCount: banners.length,
             onPageChanged: (index) {
               setState(() {
@@ -204,10 +245,9 @@ class _BannerCarouselState extends State<BannerCarousel> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => CategoryScreen(
-                            categoryName: banners[index]["category"]!,
-                          ),
+                      builder: (context) => CategoryScreen(
+                        categoryName: banners[index]["category"]!,
+                      ),
                     ),
                   );
                 },
@@ -240,174 +280,100 @@ class _BannerCarouselState extends State<BannerCarousel> {
     );
   }
 }
-
 class ProductHorizontalList extends StatelessWidget {
-  final List<Map<String, String>> products = [
-    {
-      "image": "Assets/j1chicago.jpg",
-      "name": "Air Jordan 1 Retro Chicago",
-      "price": "1.149",
-    },
-    {
-      "image": "Assets/diorcoat.jpg",
-      "name": "DiorAlps Waterproof Hooded Jacket",
-      "price": "1.105",
-    },
-    {"image": "Assets/prada5.jpg", "name": "Piqué polo shirt", "price": "775"},
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 250, // Yükseklik belirleme
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal, // Yatay kaydırma
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder:
-                      (context) => ProductDetailScreen(
-                        imagePath: products[index]["image"]!,
-                        productName: products[index]["name"]!,
-                        price: products[index]["price"]!,
-                        description: "${products[index]["name"]}.",
+      height: 250,
+      child: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('Product').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text("No products available."));
+          }
+
+          final products = snapshot.data!.docs;
+
+          return ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              final product = products[index];
+              final name = product['name'] ?? 'No name';
+              final price = product['price']?.toString() ?? '0.00';
+              final imageUrl = product['imageBase64'] ?? ''; // Use imageUrl field (must be uploaded to Firebase Storage)
+              final description = product['description'] ?? '';
+
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductDetailScreen(
+                        imagePath: imageUrl,
+                        productName: name,
+                        price: price,
+                        description: description,
                       ),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 180,
+                  margin: EdgeInsets.symmetric(horizontal: 8),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(10),
+                            ),
+                            child: Image.memory(
+                            base64Decode(imageUrl),
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            errorBuilder: (context, error, stackTrace) =>
+                             Center(child: Icon(Icons.broken_image)),
+                             ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                name,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                "\$$price",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },
-            child: Container(
-              width: 180, // Kart genişliği
-              margin: EdgeInsets.symmetric(horizontal: 8),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(10),
-                        ),
-                        child: Image.asset(
-                          products[index]["image"]!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            products[index]["name"]!,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            "\$${products[index]["price"]!}",
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           );
         },
-      ),
-    );
-  }
-}
-
-class ProductDetailScreen extends StatelessWidget {
-  final String imagePath;
-  final String productName;
-  final String price;
-  final String description;
-
-  ProductDetailScreen({
-    required this.imagePath,
-    required this.productName,
-    required this.price,
-    required this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(productName),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
-        titleTextStyle: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(imagePath, width: double.infinity, fit: BoxFit.cover),
-            SizedBox(height: 10),
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    productName,
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "\$$price",
-                    style: TextStyle(fontSize: 20, color: Colors.green),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    description,
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("${productName} Added To Cart!"),
-                        ),
-                      );
-                      // Sepete ekleme işlemi buraya gelebilir
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 50,
-                        vertical: 15,
-                      ),
-                    ),
-                    child: Text("Add to Cart"),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

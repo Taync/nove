@@ -1,10 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:random_string/random_string.dart';
-import 'package:nove_5/firebase_options.dart';
 
 class AddProduct extends StatefulWidget {
   const AddProduct({super.key});
@@ -19,7 +19,7 @@ class _AddProductState extends State<AddProduct> {
 
   final TextEditingController namecontroller = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
-
+  final TextEditingController priceController = TextEditingController();
 
   final List<String> categoryitem = [
     'Shoes',
@@ -28,13 +28,12 @@ class _AddProductState extends State<AddProduct> {
   ];
   String? selectedBrand;
 
-final List<String> brandItem = [
-  'Nike',
-  'Adidas',
-  'Puma',
-  'Reebok',
-];
-
+  final List<String> brandItem = [
+    'Nike',
+    'Adidas',
+    'Puma',
+    'Reebok',
+  ];
 
   Future getImage() async {
     final ImagePicker picker = ImagePicker();
@@ -45,37 +44,48 @@ final List<String> brandItem = [
     }
   }
 
-  void uploadItem() {
+ void uploadItem() async {
   if (file != null &&
       namecontroller.text.isNotEmpty &&
       value != null &&
       selectedBrand != null &&
-      descriptionController.text.isNotEmpty) {
+      descriptionController.text.isNotEmpty &&
+      priceController.text.isNotEmpty) {
     String addId = randomAlphaNumeric(10);
 
-    FirebaseFirestore.instance.collection("Product").doc(addId).set({
-      'name': namecontroller.text,
-      'category': value,
-      'brand': selectedBrand,
-      'description': descriptionController.text,
-      'imagePath': file!.path,
-      'id': addId,
-    }).then((_) {
+    try {
+      // Convert image to base64
+      List<int> imageBytes = await file!.readAsBytes();
+      String base64Image = base64Encode(imageBytes);
+
+      // Store base64 string in Firestore
+      await FirebaseFirestore.instance.collection("Product").doc(addId).set({
+        'name': namecontroller.text,
+        'category': value,
+        'brand': selectedBrand,
+        'description': descriptionController.text,
+        'price': double.tryParse(priceController.text) ?? 0.0,
+        'imageBase64': base64Image,
+        'id': addId,
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Product added successfully")));
+
       namecontroller.clear();
-      descriptionController.clear(); // clear description
+      priceController.clear();
+      descriptionController.clear();
       setState(() {
         file = null;
         value = null;
         selectedBrand = null;
       });
-    });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Upload failed: $e")));
+    }
   } else {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Please fill all fields")));
   }
 }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -146,47 +156,64 @@ final List<String> brandItem = [
               ),
             ),
             SizedBox(height: 20),
-Text("Brand"),
-Container(
-  padding: EdgeInsets.symmetric(horizontal: 10.0),
-  decoration: BoxDecoration(
-    color: Color(0xFFececf8),
-    borderRadius: BorderRadius.circular(10),
-  ),
-  child: DropdownButtonHideUnderline(
-    child: DropdownButton<String>(
-      items: brandItem
-          .map((brand) => DropdownMenuItem(
-                value: brand,
-                child: Text(brand),
-              ))
-          .toList(),
-      onChanged: (selected) => setState(() => selectedBrand = selected),
-      dropdownColor: Colors.white,
-      hint: Text("Select Brand"),
-      iconSize: 36,
-      icon: Icon(Icons.arrow_drop_down, color: Colors.black),
-      value: selectedBrand,
-    ),
-  ),
-),
-SizedBox(height: 20),
-Text("Description"),
-Container(
-  padding: EdgeInsets.symmetric(horizontal: 20.0),
-  decoration: BoxDecoration(
-    color: Color(0xFFececf8),
-    borderRadius: BorderRadius.circular(20),
-  ),
-  child: TextField(
-    controller: descriptionController,
-    maxLines: 3,
-    decoration: InputDecoration(
-      border: InputBorder.none,
-      hintText: "Enter product description",
-    ),
-  ),
-),
+            Text("Brand"),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              decoration: BoxDecoration(
+                color: Color(0xFFececf8),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  items: brandItem
+                      .map((brand) => DropdownMenuItem(
+                            value: brand,
+                            child: Text(brand),
+                          ))
+                      .toList(),
+                  onChanged: (selected) => setState(() => selectedBrand = selected),
+                  dropdownColor: Colors.white,
+                  hint: Text("Select Brand"),
+                  iconSize: 36,
+                  icon: Icon(Icons.arrow_drop_down, color: Colors.black),
+                  value: selectedBrand,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text("Price"),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              decoration: BoxDecoration(
+                color: Color(0xFFececf8),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: TextField(
+                controller: priceController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Enter product price",
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text("Description"),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              decoration: BoxDecoration(
+                color: Color(0xFFececf8),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: TextField(
+                controller: descriptionController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Enter product description",
+                ),
+              ),
+            ),
             SizedBox(height: 30.0),
             Center(
               child: ElevatedButton(

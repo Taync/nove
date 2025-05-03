@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const AuthGate(), //AddProduct olarak değiştirerek admin ürün eklemeye geçebilirsin
+      home: const AuthGate(), //ddProduct olarak değiştirerek admin ürün eklemeye geçebilirsin
     );
   }
 }

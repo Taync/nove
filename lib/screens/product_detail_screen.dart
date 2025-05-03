@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -39,13 +41,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           children: [
             // Ürün Resmi
             Center(
-              child: Image.asset(
-                widget.imagePath, // Sabit resim yerine değişken kullanıldı
-                height: 300,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+            child: Image.memory(
+            base64Decode(widget.imagePath),
+            height: 300,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) =>
+            Icon(Icons.broken_image, size: 100),
             ),
+            ),
+             
             SizedBox(height: 20),
 
             // Ürün Adı

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nove_5/Admin/AddProduct.dart';
 
 class AccountScreen extends StatelessWidget {
   @override
@@ -17,6 +18,15 @@ class AccountScreen extends StatelessWidget {
               await FirebaseAuth.instance.signOut();
                Navigator.pushReplacementNamed(context, '/'); //logout yapar
               }, 
+            ),
+            OutlinedButton(
+              child: Text("Add Product"),
+               onPressed: () {
+               Navigator.push(
+               context,
+               MaterialPageRoute(builder: (context) => AddProduct()),
+              );
+             },
             ),
           ],
         ),
