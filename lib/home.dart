@@ -13,18 +13,21 @@ import 'package:nove_5/splash_screen.dart';
 import 'dart:async';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MyApp());
-  await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
-
 }
 
 class MyApp extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white, // ← tüm Scaffold'lara etki eder
+      ),
+      home: SplashScreen(),
+    );
   }
 }
 
@@ -48,9 +51,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 40), // Üst ve alt boşluk
+        padding: EdgeInsets.symmetric(vertical: 40),
         child: Center(
           child: Image.asset(
             "Assets/novesplash.jpg",
@@ -73,14 +76,11 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         title: Text('NOVE'),
-
         titleTextStyle: TextStyle(
-          color: const Color.from(alpha: 1, red: 0, green: 0.196, blue: 0.38),
+          color: Color.fromRGBO(0, 50, 97, 1),
           fontWeight: FontWeight.bold,
           fontSize: 30,
         ),
-
-        // AppBar boş bırakıldı
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -110,7 +110,7 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Center(
                     child: Text(
-                      'Highlights',
+                      'HIGHLIGHTS',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -122,7 +122,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            ProductHorizontalList(), // Yatay kaydırmalı ürün listesi
+            ProductHorizontalList(),
           ],
         ),
       ),
@@ -230,7 +230,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
     return Column(
       children: [
         Container(
-          height: 333,
+          height: 380,
           child: PageView.builder(
             controller: _pageController,
             itemCount: banners.length,
@@ -245,9 +245,10 @@ class _BannerCarouselState extends State<BannerCarousel> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CategoryScreen(
-                        categoryName: banners[index]["category"]!,
-                      ),
+                      builder:
+                          (context) => CategoryScreen(
+                            categoryName: banners[index]["category"]!,
+                          ),
                     ),
                   );
                 },
@@ -271,7 +272,10 @@ class _BannerCarouselState extends State<BannerCarousel> {
               height: 8,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _currentIndex == index ? Colors.black : Colors.grey,
+                color:
+                    _currentIndex == index
+                        ? Colors.black
+                        : const Color.fromARGB(255, 178, 178, 178),
               ),
             ),
           ),
@@ -280,6 +284,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
     );
   }
 }
+
 class ProductHorizontalList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -305,20 +310,32 @@ class ProductHorizontalList extends StatelessWidget {
               final product = products[index];
               final name = product['name'] ?? 'No name';
               final price = product['price']?.toString() ?? '0.00';
-              final imageUrl = product['imageBase64'] ?? ''; // Use imageUrl field (must be uploaded to Firebase Storage)
+              final imagesData = product['images'];
+              List<String> imageList = [];
+
+              if (imagesData is List) {
+                imageList = imagesData.cast<String>();
+              } else if (imagesData is String) {
+                imageList = [imagesData];
+              }
               final description = product['description'] ?? '';
+              final brand = product['brand'];
+              final category = product['category'];
 
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProductDetailScreen(
-                        imagePath: imageUrl,
-                        productName: name,
-                        price: price,
-                        description: description,
-                      ),
+                      builder:
+                          (context) => ProductDetailScreen(
+                            images: imageList,
+                            productName: name,
+                            price: price,
+                            description: description,
+                            category: category,
+                            brand: brand,
+                          ),
                     ),
                   );
                 },
@@ -327,23 +344,21 @@ class ProductHorizontalList extends StatelessWidget {
                   margin: EdgeInsets.symmetric(horizontal: 8),
                   child: Card(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(0), // Köşeler düz
                     ),
+                    color: Colors.white, // Arka plan
+                    elevation: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(10),
-                            ),
-                            child: Image.memory(
-                            base64Decode(imageUrl),
+                          child: Image.network(
+                            imageList.isNotEmpty ? imageList[0] : '',
                             fit: BoxFit.cover,
                             width: double.infinity,
-                            errorBuilder: (context, error, stackTrace) =>
-                             Center(child: Icon(Icons.broken_image)),
-                             ),
+                            errorBuilder:
+                                (context, error, stackTrace) =>
+                                    Center(child: Icon(Icons.broken_image)),
                           ),
                         ),
                         Padding(
@@ -351,9 +366,16 @@ class ProductHorizontalList extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (brand != null)
+                                Text(
+                                  brand,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               Text(
                                 name,
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 14),
                               ),
                               SizedBox(height: 4),
                               Text(
