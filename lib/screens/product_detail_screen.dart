@@ -5,6 +5,8 @@ import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/category_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/home.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final List<String> images;
@@ -13,6 +15,7 @@ class ProductDetailScreen extends StatefulWidget {
   final String description;
   final String brand;
   final String category;
+  final String gender; // <--- yeni eklendi
 
   ProductDetailScreen({
     required this.images,
@@ -21,6 +24,7 @@ class ProductDetailScreen extends StatefulWidget {
     required this.description,
     required this.brand,
     required this.category,
+    required this.gender, // <---
   });
 
   @override
@@ -30,6 +34,8 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImageIndex = 0;
   int _selectedIndex = 0;
+  String? selectedSize;
+  List<String> sizes = [];
 
   void _onNavTap(int index) {
     setState(() {
@@ -72,6 +78,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  Future<void> fetchSizes() async {
+    final docId = "${widget.category}_${widget.gender}".toLowerCase();
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('categorySizes')
+            .doc(docId)
+            .get();
+
+    if (doc.exists && doc.data()!.containsKey('sizes')) {
+      setState(() {
+        sizes = List<String>.from(doc['sizes']);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchSizes();
+  }
+
   @override
   Widget build(BuildContext context) {
     final double imageHeight = MediaQuery.of(context).size.height * 0.6;
@@ -81,7 +108,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         children: [
           Column(
             children: [
-              // Fotoğraf
               Stack(
                 children: [
                   Container(
@@ -119,8 +145,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ],
               ),
-
-              // Sayfa göstergesi
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
@@ -139,8 +163,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ),
               ),
-
-              // Detaylar
               Expanded(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(16, 0, 16, 80),
@@ -173,11 +195,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       Wrap(
                         spacing: 10,
                         children:
-                            ["S", "M", "L", "XL"].map((size) {
+                            sizes.map((size) {
                               return ChoiceChip(
                                 label: Text(size),
-                                selected: false,
-                                onSelected: (val) {},
+                                selected: selectedSize == size,
+                                onSelected: (val) {
+                                  setState(() {
+                                    selectedSize = size;
+                                  });
+                                },
                               );
                             }).toList(),
                       ),
@@ -202,7 +228,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 width: 120,
                                 margin: EdgeInsets.only(right: 12),
                                 color: Colors.grey[300],
-                                child: Center(child: Text("Ürün $index")),
+                                child: Center(child: Text("Ürün \$index")),
                               ),
                         ),
                       ),
@@ -212,28 +238,62 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ],
           ),
-
-          // Sepete ekle butonu
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
-              color: Colors.white, // Beyaz arka plan
-              padding: EdgeInsets.fromLTRB(
-                20,
-                16,
-                20,
-                16,
-              ), // Üst-alt boşluk daha rahat görünüm için
+              color: Colors.white,
+              padding: EdgeInsets.fromLTRB(20, 16, 20, 16),
               child: SafeArea(
-                // iPhone çentikleri ve alt bar için güvenli alan
                 top: false,
                 child: SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
+                      final user = FirebaseAuth.instance.currentUser;
+                      if (user == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Lütfen tekrar giriş yapın.")),
+                        );
+                        return;
+                      }
+                      if (selectedSize == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Lütfen beden seçin.")),
+                        );
+                        return;
+                      }
+                      final cartRef = FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .collection('cart');
+                      final existing =
+                          await cartRef
+                              .where(
+                                'productName',
+                                isEqualTo: widget.productName,
+                              )
+                              .where('size', isEqualTo: selectedSize)
+                              .limit(1)
+                              .get();
+
+                      if (existing.docs.isNotEmpty) {
+                        await existing.docs.first.reference.update({
+                          'quantity': FieldValue.increment(1),
+                        });
+                      } else {
+                        await cartRef.add({
+                          'productName': widget.productName,
+                          'price': widget.price,
+                          'image': widget.images.first,
+                          'size': selectedSize,
+                          'quantity': 1,
+                          'timestamp': FieldValue.serverTimestamp(),
+                        });
+                      }
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
@@ -242,13 +302,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
                       );
                     },
-                    icon: Icon(
-                      Icons.add_shopping_cart,
-                      color: Colors.white,
-                    ), // ikon rengi
+                    icon: Icon(Icons.add_shopping_cart, color: Colors.white),
                     label: Text(
                       "ADD CART",
-                      style: TextStyle(color: Colors.white), // yazı rengi
+                      style: TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
@@ -263,8 +320,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ],
       ),
-
-      // Alt navigasyon çubuğu
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,

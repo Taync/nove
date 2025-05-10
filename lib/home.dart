@@ -335,6 +335,7 @@ class ProductHorizontalList extends StatelessWidget {
                             description: description,
                             category: category,
                             brand: brand,
+                            gender: '',
                           ),
                     ),
                   );

@@ -13,19 +13,24 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+        // Kullanıcı giriş yapmamışsa
         if (!snapshot.hasData) {
           return Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('Assets/novesplash.jpg'), // Path to your background image
-                fit: BoxFit.cover, // Adjust how the image fits (cover, contain, etc.)
+                image: AssetImage('Assets/novesplash.jpg'),
+                fit: BoxFit.cover,
               ),
             ),
             child: SignInScreen(
               providers: [
                 EmailAuthProvider(),
+                GoogleProvider(
+                  clientId:
+                      '670324928036-c105i4bjrc7r3d67cejln2snhgqjf6f7.apps.googleusercontent.com',
+                ),
               ],
-              headerBuilder: (context, constraints, shrinkOffset) {
+              headerBuilder: (context, constraints, _) {
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: AspectRatio(
@@ -37,30 +42,23 @@ class AuthGate extends StatelessWidget {
               subtitleBuilder: (context, action) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: action == AuthAction.signIn
-                      ? const Text('Welcome to Nove, please sign in!')
-                      : const Text('Welcome to Nove, please sign up!'),
-                );
-              },
-              footerBuilder: (context, action) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'By signing in, you agree to our Terms and Conditions.',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      const GoogleSignInButton(
-                        loadingIndicator: Text('Loading'),
-                        clientId: 'Assets/NoveLogo.jpg', // Note: clientId should be a valid Google OAuth client ID, not an image path
-                      ),
-                    ],
+                  child: Text(
+                    action == AuthAction.signIn
+                        ? 'Welcome to Nove, please sign in!'
+                        : 'Welcome to Nove, please sign up!',
                   ),
                 );
               },
-              sideBuilder: (context, shrinkOffset) {
+              footerBuilder: (context, action) {
+                return const Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: Text(
+                    'By signing in, you agree to our Terms and Conditions.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                );
+              },
+              sideBuilder: (context, _) {
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: AspectRatio(
@@ -72,6 +70,8 @@ class AuthGate extends StatelessWidget {
             ),
           );
         }
+
+        // Kullanıcı giriş yaptıysa
         return HomeScreen();
       },
     );

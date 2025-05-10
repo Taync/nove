@@ -86,6 +86,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             description: description,
                             category: '',
                             brand: '',
+                            gender: '',
                           ),
                     ),
                   );
