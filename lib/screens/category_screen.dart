@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:nove_5/screens/product_detail_screen.dart';
+import 'product_detail_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String categoryName;
@@ -13,7 +13,7 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  String _sortOrder = 'asc'; // varsayılan: fiyata göre artan
+  String _sortOrder = 'asc';
 
   @override
   Widget build(BuildContext context) {
@@ -28,24 +28,19 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 _sortOrder = value;
               });
             },
-            itemBuilder:
-                (context) => [
-                  PopupMenuItem(value: 'asc', child: Text('Fiyata Göre Artan')),
-                  PopupMenuItem(
-                    value: 'desc',
-                    child: Text('Fiyata Göre Azalan'),
-                  ),
-                ],
+            itemBuilder: (context) => [
+              PopupMenuItem(value: 'asc', child: Text('Fiyata Göre Artan')),
+              PopupMenuItem(value: 'desc', child: Text('Fiyata Göre Azalan')),
+            ],
           ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance
-                .collection('Product')
-                .where('category', isEqualTo: widget.categoryName)
-                .orderBy('price', descending: _sortOrder == 'desc')
-                .snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('Product')
+            .where('category', isEqualTo: widget.categoryName)
+            .orderBy('price', descending: _sortOrder == 'desc')
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -70,24 +65,26 @@ class _CategoryScreenState extends State<CategoryScreen> {
               final product = products[index];
               final name = product['name'] ?? 'Ürün';
               final price = product['price']?.toString() ?? '0';
-              final image = product['imageBase64'] ?? '';
+              final imageBase64 = product['imageBase64'] ?? [];
               final description = product['description'] ?? '';
+              final category = product['category'] ?? '';
+              final brand = product['brand'] ?? '';
+              final gender = product['gender'] ?? '';
 
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (_) => ProductDetailScreen(
-                            images: image,
-                            productName: name,
-                            price: price,
-                            description: description,
-                            category: '',
-                            brand: '',
-                            gender: '',
-                          ),
+                      builder: (_) => ProductDetailScreen(
+                        images: List<String>.from(imageBase64),
+                        productName: name,
+                        price: price,
+                        description: description,
+                        category: category,
+                        brand: brand,
+                        gender: gender,
+                      ),
                     ),
                   );
                 },
@@ -103,13 +100,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(8),
                           ),
-                          child: Image.memory(
-                            base64Decode(image),
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            errorBuilder:
-                                (_, __, ___) => Icon(Icons.broken_image),
-                          ),
+                          child: imageBase64.isNotEmpty
+                              ? Image.memory(
+                                  base64Decode(imageBase64[0]),
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (_, __, ___) => Icon(Icons.broken_image),
+                                )
+                              : Icon(Icons.image_not_supported, size: 50),
                         ),
                       ),
                       Padding(
@@ -124,7 +122,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             ),
                             SizedBox(height: 4),
                             Text(
-                              "\$$price",
+                              "₺$price",
                               style: TextStyle(color: Colors.green),
                             ),
                           ],

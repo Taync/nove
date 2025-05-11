@@ -14,11 +14,10 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
-  File? file;
+  List<File>? files; // Changed from File? to List<File> to handle multiple images
   String? value; // category
   String? selectedBrand;
   String? selectedGender;
-  String? selectedSize;
 
   final TextEditingController namecontroller = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -28,92 +27,73 @@ class _AddProductState extends State<AddProduct> {
   final List<String> genderItem = ['Male', 'Female'];
   final List<String> brandItem = ['Nike', 'Adidas', 'Puma', 'Reebok'];
 
-  List<String> availableSizes = [];
-
+  // Function to pick multiple images
   Future getImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? imagecamera = await picker.pickImage(
-      source: ImageSource.gallery,
+    final List<XFile>? images = await picker.pickMultiImage();
+    if (images != null && images.isNotEmpty) {
+      List<File> selectedFiles = images.map((image) => File(image.path)).toList();
+      setState(() {
+        files = selectedFiles;
+      });
+    }
+  }
+void uploadItem() async {
+  if (files != null &&
+      namecontroller.text.isNotEmpty &&
+      value != null &&
+      selectedGender != null &&
+      selectedBrand != null &&
+      descriptionController.text.isNotEmpty &&
+      priceController.text.isNotEmpty) {
+    String addId = randomAlphaNumeric(10);
+
+    try {
+      List<String> base64Images = [];
+
+      for (var image in files!) {
+        final bytes = await image.readAsBytes();
+        base64Images.add(base64Encode(bytes));
+      }
+
+      await FirebaseFirestore.instance.collection("Product").doc(addId).set({
+        'name': namecontroller.text,
+        'category': value,
+        'brand': selectedBrand,
+        'gender': selectedGender,
+        'description': descriptionController.text,
+        'price': double.tryParse(priceController.text) ?? 0.0,
+        'imageBase64': base64Images,
+        'id': addId,
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Product added successfully")),
+      );
+
+      namecontroller.clear();
+      priceController.clear();
+      descriptionController.clear();
+      setState(() {
+        files = null;
+        value = null;
+        selectedGender = null;
+        selectedBrand = null;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Upload failed: $e")),
+      );
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Please fill all fields")),
     );
-    if (imagecamera != null) {
-      file = File(imagecamera.path);
-      setState(() {});
-    }
   }
+}
 
-  Future<void> fetchSizes() async {
-    if (value != null && selectedGender != null) {
-      final docId = "${value!.toLowerCase()}_${selectedGender!.toLowerCase()}";
-      final doc =
-          await FirebaseFirestore.instance
-              .collection('categorySizes')
-              .doc(docId)
-              .get();
-      if (doc.exists && doc.data()!.containsKey('sizes')) {
-        setState(() {
-          availableSizes = List<String>.from(doc['sizes']);
-        });
-      } else {
-        setState(() {
-          availableSizes = [];
-        });
-      }
-    }
-  }
-
-  void uploadItem() async {
-    if (file != null &&
-        namecontroller.text.isNotEmpty &&
-        value != null &&
-        selectedGender != null &&
-        selectedBrand != null &&
-        selectedSize != null &&
-        descriptionController.text.isNotEmpty &&
-        priceController.text.isNotEmpty) {
-      String addId = randomAlphaNumeric(10);
-
-      try {
-        List<int> imageBytes = await file!.readAsBytes();
-        String base64Image = base64Encode(imageBytes);
-
-        await FirebaseFirestore.instance.collection("Product").doc(addId).set({
-          'name': namecontroller.text,
-          'category': value,
-          'brand': selectedBrand,
-          'gender': selectedGender,
-          'description': descriptionController.text,
-          'price': double.tryParse(priceController.text) ?? 0.0,
-          'imageBase64': base64Image,
-          'id': addId,
-          'size': selectedSize,
-        });
-
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Product added successfully")));
-
-        namecontroller.clear();
-        priceController.clear();
-        descriptionController.clear();
-        setState(() {
-          file = null;
-          value = null;
-          selectedGender = null;
-          selectedBrand = null;
-          availableSizes = [];
-          selectedSize = null;
-        });
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Upload failed: $e")));
-      }
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Please fill all fields")));
-    }
-  }
+  // Function to upload item to Firestore
+  
 
   @override
   Widget build(BuildContext context) {
@@ -138,44 +118,51 @@ class _AddProductState extends State<AddProduct> {
                 child: Text("Add Image"),
               ),
             ),
-            if (file != null)
-              Image.file(file!, width: 100, height: 100, fit: BoxFit.cover),
+            // Display images in a grid
+            if (files != null && files!.isNotEmpty)
+              GridView.builder(
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemCount: files!.length,
+                itemBuilder: (context, index) {
+                  return Image.file(
+                    files![index],
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  );
+                },
+              ),
             SizedBox(height: 20),
             Text("Product Name"),
             buildInput(namecontroller),
             SizedBox(height: 20),
 
-            // GENDER
             Text("Gender"),
             buildDropdown(genderItem, selectedGender, (selected) {
               setState(() {
                 selectedGender = selected;
-                value = null;
-                selectedSize = null;
-                availableSizes = [];
               });
-              fetchSizes(); // <--- eklenmeli
             }),
 
-            // CATEGORY (fetchSizes çağrısı burada yapılır)
             Text("Category"),
             buildDropdown(categoryitem, value, (selected) {
               setState(() {
                 value = selected;
-                selectedSize = null;
               });
-              fetchSizes();
             }),
             SizedBox(height: 20),
 
-            // BRAND
             Text("Brand"),
             buildDropdown(brandItem, selectedBrand, (selected) {
               setState(() => selectedBrand = selected);
             }),
             SizedBox(height: 20),
 
-            // PRICE
             Text("Price"),
             buildInput(
               priceController,
@@ -184,7 +171,6 @@ class _AddProductState extends State<AddProduct> {
             ),
             SizedBox(height: 20),
 
-            // DESCRIPTION
             Text("Description"),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -201,23 +187,6 @@ class _AddProductState extends State<AddProduct> {
                 ),
               ),
             ),
-
-            // SIZE SEÇİMİ
-            if (availableSizes.isNotEmpty) ...[
-              SizedBox(height: 20),
-              Text("Available Sizes"),
-              Wrap(
-                spacing: 10,
-                children:
-                    availableSizes.map((size) {
-                      return ChoiceChip(
-                        label: Text(size),
-                        selected: selectedSize == size,
-                        onSelected: (_) => setState(() => selectedSize = size),
-                      );
-                    }).toList(),
-              ),
-            ],
 
             SizedBox(height: 30.0),
             Center(
@@ -264,12 +233,11 @@ class _AddProductState extends State<AddProduct> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          items:
-              items
-                  .map(
-                    (item) => DropdownMenuItem(value: item, child: Text(item)),
-                  )
-                  .toList(),
+          items: items
+              .map(
+                (item) => DropdownMenuItem(value: item, child: Text(item)),
+              )
+              .toList(),
           onChanged: onChanged,
           dropdownColor: Colors.white,
           hint: Text("Select"),

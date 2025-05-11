@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +14,7 @@ class CartScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text("Sepetim")),
+      appBar: AppBar(title: Text("My Cart")),
       body: StreamBuilder<QuerySnapshot>(
         stream:
             FirebaseFirestore.instance
@@ -23,11 +25,11 @@ class CartScreen extends StatelessWidget {
                 .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Hata oluştu: ${snapshot.error}'));
+            return Center(child: Text('There was an error: ${snapshot.error}'));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('Sepetiniz boş.'));
+            return Center(child: Text('Your cart is empty.'));
           }
 
           final cartItems = snapshot.data!.docs;
@@ -45,14 +47,17 @@ class CartScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = cartItems[index];
                     return ListTile(
-                      leading: Image.network(
-                        item['image'],
-                        width: 60,
-                        height: 60,
-                        errorBuilder: (_, __, ___) => Icon(Icons.image),
-                      ),
+                      leading: item['image'] != null
+                     ? Image.memory(
+                       base64Decode(item['image']),
+                       width: 60,
+                       height: 60,
+                       fit: BoxFit.cover,
+                       errorBuilder: (_, __, ___) => Icon(Icons.broken_image),
+                       )
+                      : Icon(Icons.image),
                       title: Text(item['productName'] ?? 'Ürün'),
-                      subtitle: Text('\$${item['price']}'),
+                      subtitle: Text('\₺${item['price']}'),
                       trailing: IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
@@ -67,7 +72,7 @@ class CartScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  "Toplam: \$${total.toStringAsFixed(2)}",
+                  "Toplam: \₺${total.toStringAsFixed(2)}",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
