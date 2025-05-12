@@ -28,19 +28,24 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 _sortOrder = value;
               });
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'asc', child: Text('Fiyata Göre Artan')),
-              PopupMenuItem(value: 'desc', child: Text('Fiyata Göre Azalan')),
-            ],
+            itemBuilder:
+                (context) => [
+                  PopupMenuItem(value: 'asc', child: Text('Fiyata Göre Artan')),
+                  PopupMenuItem(
+                    value: 'desc',
+                    child: Text('Fiyata Göre Azalan'),
+                  ),
+                ],
           ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('Product')
-            .where('category', isEqualTo: widget.categoryName)
-            .orderBy('price', descending: _sortOrder == 'desc')
-            .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection('Product')
+                .where('category', isEqualTo: widget.categoryName)
+                .orderBy('price', descending: _sortOrder == 'desc')
+                .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -76,15 +81,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ProductDetailScreen(
-                        images: List<String>.from(imageBase64),
-                        productName: name,
-                        price: price,
-                        description: description,
-                        category: category,
-                        brand: brand,
-                        gender: gender,
-                      ),
+                      builder:
+                          (_) => ProductDetailScreen(
+                            images: List<String>.from(imageBase64),
+                            productName: name,
+                            price: price,
+                            description: description,
+                            category: category,
+                            brand: brand,
+                            gender: gender,
+                          ),
                     ),
                   );
                 },
@@ -100,14 +106,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(8),
                           ),
-                          child: imageBase64.isNotEmpty
-                              ? Image.memory(
-                                  base64Decode(imageBase64[0]),
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  errorBuilder: (_, __, ___) => Icon(Icons.broken_image),
-                                )
-                              : Icon(Icons.image_not_supported, size: 50),
+                          child:
+                              imageBase64.isNotEmpty
+                                  ? Image.memory(
+                                    base64Decode(imageBase64[0]),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder:
+                                        (_, __, ___) =>
+                                            Icon(Icons.broken_image),
+                                  )
+                                  : Icon(Icons.image_not_supported, size: 50),
                         ),
                       ),
                       Padding(

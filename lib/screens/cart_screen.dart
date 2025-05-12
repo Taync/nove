@@ -10,7 +10,7 @@ class CartScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      return Center(child: Text('Lütfen giriş yapın.'));
+      return Center(child: Text('Please Sign In.'));
     }
 
     return Scaffold(
@@ -47,15 +47,17 @@ class CartScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = cartItems[index];
                     return ListTile(
-                      leading: item['image'] != null
-                     ? Image.memory(
-                       base64Decode(item['image']),
-                       width: 60,
-                       height: 60,
-                       fit: BoxFit.cover,
-                       errorBuilder: (_, __, ___) => Icon(Icons.broken_image),
-                       )
-                      : Icon(Icons.image),
+                      leading:
+                          item['image'] != null
+                              ? Image.memory(
+                                base64Decode(item['image']),
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                                errorBuilder:
+                                    (_, __, ___) => Icon(Icons.broken_image),
+                              )
+                              : Icon(Icons.image),
                       title: Text(item['productName'] ?? 'Ürün'),
                       subtitle: Text('\₺${item['price']}'),
                       trailing: IconButton(

@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nove_5/firebase_options.dart';
+import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/account_screen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/category_screen.dart';
@@ -131,10 +133,7 @@ class HomeScreen extends StatelessWidget {
           if (index == 1) {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    CategoryScreen(categoryName: "All Categories"),
-              ),
+              MaterialPageRoute(builder: (context) => MainCategoryScreen()),
             );
           } else if (index == 2) {
             Navigator.push(
@@ -244,9 +243,10 @@ class _BannerCarouselState extends State<BannerCarousel> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => CategoryScreen(
-                        categoryName: banners[index]["category"]!,
-                      ),
+                      builder:
+                          (context) => CategoryScreen(
+                            categoryName: banners[index]["category"]!,
+                          ),
                     ),
                   );
                 },
@@ -270,9 +270,10 @@ class _BannerCarouselState extends State<BannerCarousel> {
               height: 8,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _currentIndex == index
-                    ? Colors.black
-                    : const Color.fromARGB(255, 178, 178, 178),
+                color:
+                    _currentIndex == index
+                        ? Colors.black
+                        : const Color.fromARGB(255, 178, 178, 178),
               ),
             ),
           ),
@@ -325,15 +326,16 @@ class ProductHorizontalList extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ProductDetailScreen(
-                        images: imageList,
-                        productName: name,
-                        price: price,
-                        description: description,
-                        category: category,
-                        brand: brand ?? '',
-                        gender: gender ?? '',
-                      ),
+                      builder:
+                          (context) => ProductDetailScreen(
+                            images: imageList,
+                            productName: name,
+                            price: price,
+                            description: description,
+                            category: category,
+                            brand: brand,
+                            gender: gender,
+                          ),
                     ),
                   );
                 },
@@ -342,23 +344,28 @@ class ProductHorizontalList extends StatelessWidget {
                   margin: EdgeInsets.symmetric(horizontal: 8),
                   child: Card(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0),
+                      borderRadius: BorderRadius.circular(0), // Köşeler düz
                     ),
-                    color: Colors.white,
+                    color: Colors.white, // Arka plan
                     elevation: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: imageList.isNotEmpty
-                              ? Image.memory(
-                                  base64Decode(imageList[0]), // Decode base64 to bytes
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Center(child: Icon(Icons.broken_image)),
-                                )
-                              : Center(child: Icon(Icons.broken_image)), // Fallback if imageList is empty
+                          child:
+                              imageList.isNotEmpty
+                                  ? Image.memory(
+                                    base64Decode(
+                                      imageList[0],
+                                    ), // Decode base64 to bytes
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Center(
+                                          child: Icon(Icons.broken_image),
+                                        ),
+                                  )
+                                  : Center(child: Icon(Icons.broken_image)),
                         ),
                         Padding(
                           padding: EdgeInsets.all(8),
@@ -378,7 +385,7 @@ class ProductHorizontalList extends StatelessWidget {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                "\₺$price",
+                                "\$$price",
                                 style: TextStyle(
                                   color: Colors.green,
                                   fontWeight: FontWeight.bold,
@@ -399,4 +406,3 @@ class ProductHorizontalList extends StatelessWidget {
     );
   }
 }
-

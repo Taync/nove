@@ -1,0 +1,43 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+class AdminCheckWrapper extends StatelessWidget {
+  final Widget child;
+
+  const AdminCheckWrapper({required this.child});
+
+  Future<bool> checkIfAdmin(String uid) async {
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    return doc.exists && doc.data()?['isAdmin'] == true;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return Scaffold(body: Center(child: Text("Please log in.")));
+    }
+
+    return FutureBuilder<bool>(
+      future: checkIfAdmin(user.uid),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+
+        if (snapshot.data == true) {
+          return child;
+        } else {
+          return Scaffold(
+            body: Center(
+              child: Text("You are not authorized to view this page."),
+            ),
+          );
+        }
+      },
+    );
+  }
+}
