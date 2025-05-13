@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:nove_5/home.dart';
 import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/account_screen.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:nove_5/screens/Product.dart';
 import 'package:nove_5/screens/product_detail_screen.dart';
 
@@ -102,213 +100,183 @@ class _CartScreenState extends State<CartScreen> {
                     bool gift =
                         data.containsKey('gift') ? data['gift'] as bool : false;
                     int quantity = data['quantity'] ?? 1;
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProductDetailScreen(
-                              images: [item['image'] ?? ''],
-                              productName: item['productName'] ?? '-',
-                              price: item['price'] ?? '-',
-                              description: data['description'] ?? '-',
-                              brand: data['brand'] ?? '-',
-                              category: data['category'] ?? '-',
-                              gender: data['gender'] ?? '-',
-                              color: data['color'] ?? '-',
-                            ),
+                    // Inside your ListView.builder itemBuilder:
+return InkWell(
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductDetailScreen(
+          images: [item['image'] ?? ''],
+          productName: item['productName'] ?? '-',
+          price: item['price'] ?? '-',
+          description: data['description'] ?? '-',
+          brand: data['brand'] ?? '-',
+          category: data['category'] ?? '-',
+          gender: data['gender'] ?? '-',
+          color: data['color'] ?? '-',
+        ),
+      ),
+    );
+  },
+  child: Padding(
+    padding: const EdgeInsets.symmetric(
+      vertical: 8.0,
+      horizontal: 12.0,
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                item['image'],
+                width: 90,
+                height: 110,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 90,
+                  height: 110,
+                  color: Colors.grey[300],
+                  child: Icon(
+                    Icons.broken_image,
+                    size: 40,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item['productName'] ?? '-',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
-                        );
-                      },
-                      child: Slidable(
-                        key: ValueKey(item.id),
-                        endActionPane: ActionPane(
-                          motion: const DrawerMotion(),
-                          children: [
-                            SlidableAction(
-                              onPressed: (context) async {
-                                // TODO: Implement move to favorites logic
-                                // For now, just show a snackbar
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Moved to Favorites (not implemented)')),
-                                );
-                              },
-                              backgroundColor: Colors.grey,
-                              foregroundColor: Colors.white,
-                              label: 'Move to Favorites',
-                            ),
-                            SlidableAction(
-                              onPressed: (context) async {
-                                await item.reference.delete();
-                              },
-                              backgroundColor: Colors.red,
-                              foregroundColor: Colors.white,
-                              label: 'Delete',
-                            ),
-                          ],
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8.0,
-                            horizontal: 12.0,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      item['image'],
-                                      width: 90,
-                                      height: 110,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (_, __, ___) => Container(
-                                            width: 90,
-                                            height: 110,
-                                            color: Colors.grey[300],
-                                            child: Icon(
-                                              Icons.broken_image,
-                                              size: 40,
-                                            ),
-                                          ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                item['productName'] ?? '-',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                ),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                            SizedBox(width: 6),
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 2,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black,
-                                                borderRadius: BorderRadius.circular(
-                                                  4,
-                                                ),
-                                              ),
-                                              child: Text(
-                                                'Fast Delivery',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              'Color: ',
-                                              style: TextStyle(
-                                                color: Colors.grey[700],
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                            Text(
-                                              color,
-                                              style: TextStyle(fontSize: 13),
-                                            ),
-                                            SizedBox(width: 12),
-                                            Text(
-                                              'Size: ',
-                                              style: TextStyle(
-                                                color: Colors.grey[700],
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                            Text(
-                                              size,
-                                              style: TextStyle(fontSize: 13),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 10),
-                                        // Quantity Dropdown
-                                        Container(
-                                          width: 160,
-                                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            border: Border.all(color: Colors.grey.shade400),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: DropdownButtonHideUnderline(
-                                            child: DropdownButton<int>(
-                                              value: quantity,
-                                              isExpanded: true,
-                                              icon: Icon(Icons.keyboard_arrow_down),
-                                              items: List.generate(10, (i) => i + 1)
-                                                  .map((q) => DropdownMenuItem(
-                                                        value: q,
-                                                        child: Text('$q Quantity'),
-                                                      ))
-                                                  .toList(),
-                                              onChanged: (newQty) {
-                                                if (newQty != null) {
-                                                  item.reference.update({'quantity': newQty});
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              '₺${item['price']}',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Checkbox(
-                                    value: gift,
-                                    onChanged: (val) {
-                                      if (val != null) {
-                                        item.reference.update({'gift': val});
-                                      }
-                                    },
-                                  ),
-                                  Text('I want a gift package'),
-                                ],
-                              ),
-                            ],
+                      ),
+                      SizedBox(width: 6),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'Fast Delivery',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                           ),
                         ),
                       ),
-                    );
+                    ],
+                  ),
+                  SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text(
+                        'Color: ',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        color,
+                        style: TextStyle(fontSize: 13),
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        'Size: ',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 13,
+                        ),
+                      ),
+                      Text(
+                        size,
+                        style: TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: 160,
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int>(
+                        value: quantity,
+                        isExpanded: true,
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        items: List.generate(10, (i) => i + 1)
+                            .map((q) => DropdownMenuItem(
+                                  value: q,
+                                  child: Text('$q Quantity'),
+                                ))
+                            .toList(),
+                        onChanged: (newQty) {
+                          if (newQty != null) {
+                            item.reference.update({'quantity': newQty});
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text(
+                        '₺${item['price']}',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Checkbox(
+              value: gift,
+              onChanged: (val) {
+                if (val != null) {
+                  item.reference.update({'gift': val});
+                }
+              },
+            ),
+            Text('I want a gift package'),
+          ],
+        ),
+      ],
+    ),
+  ),
+);
+
                   },
                 ),
               ),

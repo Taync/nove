@@ -75,8 +75,7 @@ class _AddProductState extends State<AddProduct> {
     final ImagePicker picker = ImagePicker();
     final List<XFile>? images = await picker.pickMultiImage();
     if (images != null && images.isNotEmpty) {
-      List<File> selectedFiles =
-          images.map((image) => File(image.path)).toList();
+       List<File> selectedFiles = images.map((image) => File(image.path)).toList();
       setState(() {
         files = selectedFiles;
       });
@@ -84,43 +83,33 @@ class _AddProductState extends State<AddProduct> {
   }
 
   void uploadItem() async {
-    if (
-        ((files != null && files!.isNotEmpty) || imageLinks.isNotEmpty) &&
-        namecontroller.text.isNotEmpty &&
-        value != null &&
-        selectedGender != null &&
-        selectedBrand != null &&
-        descriptionController.text.isNotEmpty &&
-        priceController.text.isNotEmpty
-    ) {
-      String addId = randomAlphaNumeric(10);
+  if (files != null &&
+      namecontroller.text.isNotEmpty &&
+      value != null &&
+      selectedGender != null &&
+      selectedBrand != null &&
+      descriptionController.text.isNotEmpty &&
+      priceController.text.isNotEmpty) {
+    String addId = randomAlphaNumeric(10);
 
-      try {
-        List<String> imageUrls = [];
+    try {
+      List<String> base64Images = [];
 
-        if (files != null && files!.isNotEmpty) {
-          for (var image in files!) {
-            // Here you would typically upload the image to a storage service
-            // and get the URL. For now, we'll just use the image links
-            // You should implement proper image upload to Firebase Storage
-            // and get the download URLs
-          }
-        }
+      for (var image in files!) {
+        final bytes = await image.readAsBytes();
+        base64Images.add(base64Encode(bytes));
+      }
 
-        imageUrls.addAll(imageLinks);
-
-        await FirebaseFirestore.instance.collection("Product").doc(addId).set({
-          'name': namecontroller.text,
-          'category': value,
-          'brand': selectedBrand,
-          'gender': selectedGender,
-          'description': descriptionController.text,
-          'price': double.tryParse(priceController.text) ?? 0.0,
-          'imageUrls': imageUrls,
-          'color': selectedColor,
-          'id': addId,
-          'stock': int.tryParse(stockController.text) ?? 0,
-        });
+      await FirebaseFirestore.instance.collection("Product").doc(addId).set({
+        'name': namecontroller.text,
+        'category': value,
+        'brand': selectedBrand,
+        'gender': selectedGender,
+        'description': descriptionController.text,
+        'price': double.tryParse(priceController.text) ?? 0.0,
+        'imageBase64': base64Images,
+        'id': addId,
+      });
 
         ScaffoldMessenger.of(
           context,
