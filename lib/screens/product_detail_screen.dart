@@ -8,7 +8,7 @@ import 'package:nove_5/screens/account_screen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/category_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
-import 'package:nove_5/screens/home.dart';
+import 'package:nove_5/screens/Product.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final List<String> images;

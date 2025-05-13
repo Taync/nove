@@ -12,6 +12,7 @@ import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/product_detail_screen.dart';
 import 'package:nove_5/splash_screen.dart';
 import 'dart:async';
+import 'package:nove_5/screens/ordersscreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -7,6 +7,8 @@ import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/category_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
+import 'package:nove_5/screens/ordersscreen.dart';
+import 'package:nove_5/home.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -54,7 +56,11 @@ class _AccountScreenState extends State<AccountScreen> {
 
   void onTabTapped(int index) {
     if (index == 0) {
-      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => HomeScreen()),
+        (route) => false,
+      );
     } else if (index == 1) {
       Navigator.push(
         context,
@@ -73,47 +79,167 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("My Account")),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ListTile(
-            title: Text(userName),
-            subtitle: Text(userEmail),
-            leading: Icon(Icons.account_circle, size: 40),
-          ),
-          const Divider(),
-          ListTile(leading: Icon(Icons.shopping_bag), title: Text("My Orders")),
-          ListTile(leading: Icon(Icons.favorite), title: Text("My Favourites")),
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: Text("Account Settings"),
-          ),
-          const Divider(),
-          ListTile(leading: Icon(Icons.store), title: Text("Mağazalar")),
-          ListTile(
-            leading: Icon(Icons.help_center),
-            title: Text("Ürün Sorularım"),
-          ),
-          ListTile(leading: Icon(Icons.info), title: Text("Bilgi Merkezi")),
-          const Divider(),
-          if (isAdmin)
-            ListTile(
-              leading: Icon(Icons.admin_panel_settings),
-              title: Text("Admin Panel"),
+      appBar: null,
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Profile Section with background
+            Stack(
+              children: [
+                Container(
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(24),
+                      bottomRight: Radius.circular(24),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 40, left: 16, right: 16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.account_circle, size: 56, color: Colors.white),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userName,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              userEmail,
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.notifications_none, color: Colors.white),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            // Main Buttons Card
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _MainButton(
+                        icon: Icons.shopping_bag,
+                        label: 'My Orders',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => OrdersScreen()),
+                          );
+                        },
+                      ),
+                      _MainButton(
+                        icon: Icons.favorite,
+                        label: 'My Favourites',
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => FavouritesScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      _MainButton(
+                        icon: Icons.settings,
+                        label: 'Account Settings',
+                        onTap: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Coming soon!')),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Pushable List Items
+            _PushableListTile(
+              icon: Icons.store,
+              label: 'Shops',
               onTap: () {
-                Navigator.push(
+                ScaffoldMessenger.of(
                   context,
-                  MaterialPageRoute(builder: (_) => AdminPanelScreen()),
-                );
+                ).showSnackBar(SnackBar(content: Text('Coming soon!')));
               },
             ),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text("Logout"),
-            onTap: logout,
-          ),
-        ],
+            _PushableListTile(
+              icon: Icons.help_center,
+              label: 'Product',
+              onTap: () {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Coming soon!')));
+              },
+            ),
+            _PushableListTile(
+              icon: Icons.info,
+              label: 'Bilgi Merkezi',
+              onTap: () {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text('Coming soon!')));
+              },
+            ),
+            Divider(),
+            if (isAdmin)
+              _PushableListTile(
+                icon: Icons.admin_panel_settings,
+                label: 'Admin Panel',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => AdminPanelScreen()),
+                  );
+                },
+              ),
+            _PushableListTile(
+              icon: Icons.logout,
+              label: 'Çıkış Yap',
+              onTap: logout,
+            ),
+            SizedBox(height: 16),
+            Center(
+              child: Text(
+                'Version: 0.7.5',
+                style: TextStyle(color: Colors.grey, fontSize: 13),
+              ),
+            ),
+            SizedBox(height: 16),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -141,6 +267,59 @@ class _AccountScreenState extends State<AccountScreen> {
             label: 'Account',
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Main Button Widget
+class _MainButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _MainButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Column(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.black87,
+            child: Icon(icon, color: Colors.white),
+            radius: 24,
+          ),
+          SizedBox(height: 6),
+          Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+}
+
+// Pushable ListTile Widget
+class _PushableListTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _PushableListTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(label),
+        trailing: Icon(Icons.chevron_right, color: Colors.grey),
       ),
     );
   }
