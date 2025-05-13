@@ -382,7 +382,7 @@ class ProductHorizontalList extends StatelessWidget {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                "\$$price",
+                                "\₺$price",
                                 style: TextStyle(
                                   color: Colors.green,
                                   fontWeight: FontWeight.bold,
