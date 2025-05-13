@@ -34,7 +34,7 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Kategori Yönetimi")),
+      appBar: AppBar(title: Text("Category Management")),
       body: Column(
         children: [
           Padding(
@@ -43,15 +43,15 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
               children: [
                 TextField(
                   controller: _nameController,
-                  decoration: InputDecoration(labelText: 'Kategori Adı'),
+                  decoration: InputDecoration(labelText: 'Category Name'),
                 ),
                 TextField(
                   controller: _imageUrlController,
-                  decoration: InputDecoration(labelText: 'Resim URL'),
+                  decoration: InputDecoration(labelText: 'Image URL'),
                 ),
                 ElevatedButton(
                   onPressed: addCategory,
-                  child: Text("Kategori Ekle"),
+                  child: Text("Add Category"),
                 ),
               ],
             ),

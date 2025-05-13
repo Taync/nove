@@ -18,6 +18,7 @@ class ProductDetailScreen extends StatefulWidget {
   final String brand;
   final String category;
   final String gender;
+  final String color;
 
   ProductDetailScreen({
     required this.images,
@@ -27,6 +28,7 @@ class ProductDetailScreen extends StatefulWidget {
     required this.brand,
     required this.category,
     required this.gender,
+    required this.color,
   });
 
   @override
@@ -102,8 +104,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   });
                 },
                 itemBuilder: (context, index) {
-                  return Image.memory(
-                    base64Decode(widget.images[index]),
+                  return Image.network(
+                    widget.images[index],
                     fit: BoxFit.contain,
                     width: double.infinity,
                     errorBuilder:
@@ -158,8 +160,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                     SizedBox(height: 20),
+                    // Color row
+                    Row(
+                      children: [
+                        Text('Color: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(widget.color),
+                      ],
+                    ),
+                    SizedBox(height: 10),
                     Text(
-                      "Beden Seçimi",
+                      "Select Size",
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
@@ -187,7 +197,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Text(widget.description, style: TextStyle(fontSize: 16)),
                     SizedBox(height: 20),
                     Text(
-                      "Son Gezilenler",
+                      "Recently Viewed",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -204,7 +214,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               width: 120,
                               margin: EdgeInsets.only(right: 12),
                               color: Colors.grey[300],
-                              child: Center(child: Text("Ürün $index")),
+                              child: Center(child: Text("Product $index")),
                             ),
                       ),
                     ),
@@ -233,7 +243,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   onPressed: () async {
                     if (_selectedSize == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Lütfen bir beden seçin.")),
+                        SnackBar(content: Text("Please select a size.")),
                       );
                       return;
                     }
@@ -241,7 +251,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     final user = FirebaseAuth.instance.currentUser;
                     if (user == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Lütfen giriş yapın.")),
+                        SnackBar(content: Text("Please sign in.")),
+                      );
+                      return;
+                    }
+
+                    // Check if product already exists in cart
+                    final cartQuery = await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user.uid)
+                        .collection('cart')
+                        .where('productName', isEqualTo: widget.productName)
+                        .where('size', isEqualTo: _selectedSize)
+                        .where('color', isEqualTo: widget.color)
+                        .get();
+
+                    if (cartQuery.docs.isNotEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("This product is already in your cart.")),
                       );
                       return;
                     }
@@ -255,29 +282,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             'productName': widget.productName,
                             'price': widget.price,
                             'size': _selectedSize,
+                            'color': widget.color,
                             'image':
                                 widget.images.isNotEmpty
                                     ? widget.images[0]
                                     : '',
                             'timestamp': FieldValue.serverTimestamp(),
+                            'gift': false,
+                            'quantity': 1,
                           });
+
+                      // Get the updated cart count
+                      final cartSnapshot = await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(user.uid)
+                          .collection('cart')
+                          .get();
+                      final cartCount = cartSnapshot.docs.length;
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            "${widget.productName} ($_selectedSize) sepete eklendi!",
+                            "You have $cartCount product${cartCount > 1 ? 's' : ''} in your cart.",
                           ),
+                          duration: Duration(seconds: 2),
                         ),
                       );
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Sepete ekleme hatası: $e")),
+                        SnackBar(content: Text("Failed to add to cart: $e")),
                       );
                     }
                   },
                   icon: Icon(Icons.add_shopping_cart, color: Colors.white),
                   label: Text(
-                    "ADD CART",
+                    "ADD TO CART",
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -322,5 +361,44 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ],
       ),
     );
+  }
+
+  Color _getColorFromName(String colorName) {
+    switch (colorName.toLowerCase()) {
+      case 'red':
+        return Colors.red;
+      case 'green':
+        return Colors.green;
+      case 'blue':
+        return Colors.blue;
+      case 'black':
+        return Colors.black;
+      case 'white':
+        return Colors.white;
+      case 'yellow':
+        return Colors.yellow;
+      case 'orange':
+        return Colors.orange;
+      case 'purple':
+        return Colors.purple;
+      case 'pink':
+        return Colors.pink;
+      case 'brown':
+        return Colors.brown;
+      case 'gray':
+        return Colors.grey;
+      case 'beige':
+        return Color(0xFFF5F5DC);
+      case 'navy':
+        return Color(0xFF001F54);
+      case 'turquoise':
+        return Color(0xFF40E0D0);
+      case 'gold':
+        return Color(0xFFFFD700);
+      case 'silver':
+        return Color(0xFFC0C0C0);
+      default:
+        return Colors.transparent;
+    }
   }
 }

@@ -36,7 +36,7 @@ class MainCategoryScreen extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.all(16),
                   child: Text(
-                    'FEMALE',
+                    'WOMEN',
                     style: TextStyle(
                       fontSize: 24,
                       color: Colors.white,
@@ -58,6 +58,7 @@ class MainCategoryScreen extends StatelessWidget {
                 ),
               );
             },
+
             child: Stack(
               alignment: Alignment.centerLeft,
               children: [
@@ -71,7 +72,43 @@ class MainCategoryScreen extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.all(16),
                   child: Text(
-                    'MALE',
+                    'MAN',
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      shadows: [Shadow(blurRadius: 4, color: Colors.black)],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SubCategoryScreen(gender: 'MEN'),
+                ),
+              );
+            },
+
+            child: Stack(
+              alignment: Alignment.centerLeft,
+              children: [
+                Image.asset(
+                  'Assets/golden.jpg', // kendi resmini koy
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                Container(
+                  height: 160,
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'KIDS',
                     style: TextStyle(
                       fontSize: 24,
                       color: Colors.white,

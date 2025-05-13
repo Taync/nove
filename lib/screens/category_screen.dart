@@ -30,10 +30,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
             },
             itemBuilder:
                 (context) => [
-                  PopupMenuItem(value: 'asc', child: Text('Fiyata Göre Artan')),
+                  PopupMenuItem(value: 'asc', child: Text('Sort by Price: Low to High')),
                   PopupMenuItem(
                     value: 'desc',
-                    child: Text('Fiyata Göre Azalan'),
+                    child: Text('Sort by Price: High to Low'),
                   ),
                 ],
           ),
@@ -52,7 +52,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("Bu kategoride ürün bulunamadı."));
+            return Center(child: Text("No products found in this category."));
           }
 
           final products = snapshot.data!.docs;
@@ -70,11 +70,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
               final product = products[index];
               final name = product['name'] ?? 'Ürün';
               final price = product['price']?.toString() ?? '0';
-              final imageBase64 = product['imageBase64'] ?? [];
+              final imageUrls = product['imageUrls'] ?? [];
               final description = product['description'] ?? '';
               final category = product['category'] ?? '';
               final brand = product['brand'] ?? '';
               final gender = product['gender'] ?? '';
+              final color = product['color'] ?? 'Green';
 
               return GestureDetector(
                 onTap: () {
@@ -83,13 +84,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     MaterialPageRoute(
                       builder:
                           (_) => ProductDetailScreen(
-                            images: List<String>.from(imageBase64),
+                            images: List<String>.from(imageUrls),
                             productName: name,
                             price: price,
                             description: description,
                             category: category,
                             brand: brand,
                             gender: gender,
+                            color: color,
                           ),
                     ),
                   );
@@ -107,9 +109,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             top: Radius.circular(8),
                           ),
                           child:
-                              imageBase64.isNotEmpty
-                                  ? Image.memory(
-                                    base64Decode(imageBase64[0]),
+                              imageUrls.isNotEmpty
+                                  ? Image.network(
+                                    imageUrls[0],
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     errorBuilder:

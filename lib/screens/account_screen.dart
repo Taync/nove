@@ -159,7 +159,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                       _MainButton(
                         icon: Icons.favorite,
-                        label: 'My Favourites',
+                        label: 'My Favorites',
                         onTap: () {
                           Navigator.push(
                             context,
@@ -206,7 +206,7 @@ class _AccountScreenState extends State<AccountScreen> {
             ),
             _PushableListTile(
               icon: Icons.info,
-              label: 'Bilgi Merkezi',
+              label: 'Information Center',
               onTap: () {
                 ScaffoldMessenger.of(
                   context,
@@ -227,7 +227,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
             _PushableListTile(
               icon: Icons.logout,
-              label: 'Çıkış Yap',
+              label: 'Log Out',
               onTap: logout,
             ),
             SizedBox(height: 16),

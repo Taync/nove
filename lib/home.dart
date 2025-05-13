@@ -309,7 +309,7 @@ class ProductHorizontalList extends StatelessWidget {
               final product = products[index];
               final name = product['name'] ?? 'No name';
               final price = product['price']?.toString() ?? '0.00';
-              final imagesData = product['imageBase64'];
+              final imagesData = product['imageUrls'];
               List<String> imageList = [];
 
               if (imagesData is List) {
@@ -321,6 +321,7 @@ class ProductHorizontalList extends StatelessWidget {
               final brand = product['brand'];
               final category = product['category'];
               final gender = product['gender'];
+              final color = product['color'] ?? '';
 
               return GestureDetector(
                 onTap: () {
@@ -336,6 +337,7 @@ class ProductHorizontalList extends StatelessWidget {
                             category: category,
                             brand: brand,
                             gender: gender,
+                            color: color,
                           ),
                     ),
                   );
@@ -355,10 +357,8 @@ class ProductHorizontalList extends StatelessWidget {
                         Expanded(
                           child:
                               imageList.isNotEmpty
-                                  ? Image.memory(
-                                    base64Decode(
-                                      imageList[0],
-                                    ), // Decode base64 to bytes
+                                  ? Image.network(
+                                    imageList[0],
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     errorBuilder:
