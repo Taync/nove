@@ -309,7 +309,7 @@ class ProductHorizontalList extends StatelessWidget {
               final product = products[index];
               final name = product['name'] ?? 'No name';
               final price = product['price']?.toString() ?? '0.00';
-              final imagesData = product['imageUrls'];
+              final imagesData = product['imageBase64'];
               List<String> imageList = [];
 
               if (imagesData is List) {
@@ -321,24 +321,22 @@ class ProductHorizontalList extends StatelessWidget {
               final brand = product['brand'];
               final category = product['category'];
               final gender = product['gender'];
-              final color = product['color'] ?? '';
 
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => ProductDetailScreen(
-                            images: imageList,
-                            productName: name,
-                            price: price,
-                            description: description,
-                            category: category,
-                            brand: brand,
-                            gender: gender,
-                            color: color,
-                          ),
+                      builder: (context) => ProductDetailScreen(
+                        images: imageList,
+                        productName: name,
+                        price: price,
+                        description: description,
+                        category: category,
+                        brand: brand,
+                        gender: gender, 
+                        color: '',
+                      ),
                     ),
                   );
                 },
@@ -347,26 +345,24 @@ class ProductHorizontalList extends StatelessWidget {
                   margin: EdgeInsets.symmetric(horizontal: 8),
                   child: Card(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0), // Köşeler düz
+                      borderRadius: BorderRadius.circular(0), // No rounded corners
                     ),
-                    color: Colors.white, // Arka plan
+                    color: Colors.white, // Card color
                     elevation: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child:
-                              imageList.isNotEmpty
-                                  ? Image.network(
-                                    imageList[0],
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    errorBuilder:
-                                        (context, error, stackTrace) => Center(
-                                          child: Icon(Icons.broken_image),
-                                        ),
-                                  )
-                                  : Center(child: Icon(Icons.broken_image)),
+                          child: imageList.isNotEmpty
+                              ? Image.memory(
+                                  base64Decode(imageList[0]),
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Center(child: Icon(Icons.broken_image));
+                                  },
+                                )
+                              : Center(child: Icon(Icons.broken_image)),
                         ),
                         Padding(
                           padding: EdgeInsets.all(8),
@@ -407,3 +403,4 @@ class ProductHorizontalList extends StatelessWidget {
     );
   }
 }
+

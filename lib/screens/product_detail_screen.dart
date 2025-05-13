@@ -6,12 +6,10 @@ import 'package:nove_5/home.dart';
 import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/account_screen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
-import 'package:nove_5/screens/category_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
-import 'package:nove_5/screens/Product.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final List<String> images;
+  final List<String> images; // Base64 images
   final String productName;
   final String price;
   final String description;
@@ -47,34 +45,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     switch (index) {
       case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => HomeScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
         break;
       case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => MainCategoryScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => MainCategoryScreen()));
         break;
       case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => CartScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CartScreen()));
         break;
       case 3:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => FavouritesScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => FavouritesScreen()));
         break;
       case 4:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => AccountScreen()),
-        );
+        Navigator.push(context, MaterialPageRoute(builder: (_) => AccountScreen()));
         break;
     }
   }
@@ -83,15 +66,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget build(BuildContext context) {
     final double imageHeight = MediaQuery.of(context).size.height * 0.6;
     final isShoesCategory = widget.category.toLowerCase() == 'shoes';
-    final sizeOptions =
-        isShoesCategory
-            ? List<String>.generate(10, (i) => (36 + i).toString()) // 36–45
-            : ['S', 'M', 'L', 'XL'];
+    final sizeOptions = isShoesCategory
+        ? List<String>.generate(10, (i) => (36 + i).toString())
+        : ['S', 'M', 'L', 'XL'];
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // SliverAppBar for product image
           SliverAppBar(
             expandedHeight: imageHeight,
             pinned: true,
@@ -104,21 +85,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   });
                 },
                 itemBuilder: (context, index) {
-                  return Image.network(
-                    widget.images[index],
-                    fit: BoxFit.contain,
-                    width: double.infinity,
-                    errorBuilder:
-                        (_, __, ___) => Icon(Icons.broken_image, size: 150),
-                  );
+                  try {
+                    final imageBytes = base64Decode(widget.images[index]);
+                    return Image.memory(
+                      imageBytes,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      errorBuilder: (_, __, ___) =>
+                          Icon(Icons.broken_image, size: 150),
+                    );
+                  } catch (e) {
+                    return Center(child: Icon(Icons.error));
+                  }
                 },
               ),
             ),
           ),
-          // Product content
           SliverList(
             delegate: SliverChildListDelegate([
-              // Page indicators
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
@@ -129,10 +113,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     height: 8,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color:
-                          _currentImageIndex == index
-                              ? Colors.black
-                              : Colors.grey,
+                      color: _currentImageIndex == index
+                          ? Colors.black
+                          : Colors.grey,
                     ),
                   ),
                 ),
@@ -144,64 +127,57 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   children: [
                     Text(
                       widget.brand,
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 8),
                     Text(widget.productName, style: TextStyle(fontSize: 20)),
                     SizedBox(height: 10),
                     Text(
                       "₺${widget.price}",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 20),
-                    // Color row
                     Row(
                       children: [
-                        Text('Color: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Color: ',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                         Text(widget.color),
                       ],
                     ),
                     SizedBox(height: 10),
-                    Text(
-                      "Select Size",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    Text("Select Size",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(height: 10),
                     Wrap(
                       spacing: 10,
-                      children:
-                          sizeOptions.map((size) {
-                            final isSelected = _selectedSize == size;
-                            return ChoiceChip(
-                              label: Text(size),
-                              selected: isSelected,
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  _selectedSize = selected ? size : null;
-                                });
-                              },
-                              selectedColor: Colors.black,
-                              labelStyle: TextStyle(
-                                color: isSelected ? Colors.white : Colors.black,
-                              ),
-                            );
-                          }).toList(),
+                      children: sizeOptions.map((size) {
+                        final isSelected = _selectedSize == size;
+                        return ChoiceChip(
+                          label: Text(size),
+                          selected: isSelected,
+                          onSelected: (bool selected) {
+                            setState(() {
+                              _selectedSize = selected ? size : null;
+                            });
+                          },
+                          selectedColor: Colors.black,
+                          labelStyle: TextStyle(
+                            color:
+                                isSelected ? Colors.white : Colors.black,
+                          ),
+                        );
+                      }).toList(),
                     ),
                     SizedBox(height: 20),
-                    Text(widget.description, style: TextStyle(fontSize: 16)),
+                    Text(widget.description,
+                        style: TextStyle(fontSize: 16)),
                     SizedBox(height: 20),
                     Text(
                       "Recently Viewed",
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
                     Container(
@@ -209,13 +185,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: 5,
-                        itemBuilder:
-                            (_, index) => Container(
-                              width: 120,
-                              margin: EdgeInsets.only(right: 12),
-                              color: Colors.grey[300],
-                              child: Center(child: Text("Product $index")),
-                            ),
+                        itemBuilder: (_, index) => Container(
+                          width: 120,
+                          margin: EdgeInsets.only(right: 12),
+                          color: Colors.grey[300],
+                          child: Center(child: Text("Product $index")),
+                        ),
                       ),
                     ),
                   ],
@@ -225,12 +200,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ],
       ),
-
-      // Add to Cart Button
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Add to Cart Button
           Container(
             color: Colors.white,
             padding: EdgeInsets.fromLTRB(20, 16, 20, 16),
@@ -256,19 +228,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       return;
                     }
 
-                    // Check if product already exists in cart
                     final cartQuery = await FirebaseFirestore.instance
                         .collection('users')
                         .doc(user.uid)
                         .collection('cart')
-                        .where('productName', isEqualTo: widget.productName)
+                        .where('productName',
+                            isEqualTo: widget.productName)
                         .where('size', isEqualTo: _selectedSize)
                         .where('color', isEqualTo: widget.color)
                         .get();
 
                     if (cartQuery.docs.isNotEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("This product is already in your cart.")),
+                        SnackBar(
+                            content: Text(
+                                "This product is already in your cart.")),
                       );
                       return;
                     }
@@ -279,20 +253,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           .doc(user.uid)
                           .collection('cart')
                           .add({
-                            'productName': widget.productName,
-                            'price': widget.price,
-                            'size': _selectedSize,
-                            'color': widget.color,
-                            'image':
-                                widget.images.isNotEmpty
-                                    ? widget.images[0]
-                                    : '',
-                            'timestamp': FieldValue.serverTimestamp(),
-                            'gift': false,
-                            'quantity': 1,
-                          });
+                        'productName': widget.productName,
+                        'price': widget.price,
+                        'size': _selectedSize,
+                        'color': widget.color,
+                        'image': widget.images.isNotEmpty
+                            ? widget.images[0]
+                            : '',
+                        'timestamp': FieldValue.serverTimestamp(),
+                        'gift': false,
+                        'quantity': 1,
+                      });
 
-                      // Get the updated cart count
                       final cartSnapshot = await FirebaseFirestore.instance
                           .collection('users')
                           .doc(user.uid)
@@ -303,22 +275,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            "You have $cartCount product${cartCount > 1 ? 's' : ''} in your cart.",
-                          ),
+                              "You have $cartCount product${cartCount > 1 ? 's' : ''} in your cart."),
                           duration: Duration(seconds: 2),
                         ),
                       );
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Failed to add to cart: $e")),
+                        SnackBar(
+                            content: Text("Failed to add to cart: $e")),
                       );
                     }
                   },
                   icon: Icon(Icons.add_shopping_cart, color: Colors.white),
-                  label: Text(
-                    "ADD TO CART",
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  label: Text("ADD TO CART",
+                      style: TextStyle(color: Colors.white)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
@@ -329,8 +299,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
           ),
-
-          // Bottom Navigation Bar
           BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: _selectedIndex,
@@ -339,66 +307,66 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
                 label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.grid_view_outlined),
-                label: 'Categories',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_bag_outlined),
-                label: 'Cart',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.favorite_outline),
-                label: 'Favourites',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_outline),
-                label: 'Account',
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Color _getColorFromName(String colorName) {
-    switch (colorName.toLowerCase()) {
-      case 'red':
-        return Colors.red;
-      case 'green':
-        return Colors.green;
-      case 'blue':
-        return Colors.blue;
-      case 'black':
-        return Colors.black;
-      case 'white':
-        return Colors.white;
-      case 'yellow':
-        return Colors.yellow;
-      case 'orange':
-        return Colors.orange;
-      case 'purple':
-        return Colors.purple;
-      case 'pink':
-        return Colors.pink;
-      case 'brown':
-        return Colors.brown;
-      case 'gray':
-        return Colors.grey;
-      case 'beige':
-        return Color(0xFFF5F5DC);
-      case 'navy':
-        return Color(0xFF001F54);
-      case 'turquoise':
-        return Color(0xFF40E0D0);
-      case 'gold':
-        return Color(0xFFFFD700);
-      case 'silver':
-        return Color(0xFFC0C0C0);
-      default:
-        return Colors.transparent;
-    }
-  }
+                ),
+BottomNavigationBarItem(
+icon: Icon(Icons.grid_view_outlined),
+label: 'Categories',
+),
+BottomNavigationBarItem(
+icon: Icon(Icons.shopping_bag_outlined),
+label: 'Cart',
+),
+BottomNavigationBarItem(
+icon: Icon(Icons.favorite_outline),
+label: 'Favourites',
+),
+BottomNavigationBarItem(
+icon: Icon(Icons.person_outline),
+label: 'Account',
+),
+],
+),
+],
+),
+);
 }
+
+Color _getColorFromName(String colorName) {
+switch (colorName.toLowerCase()) {
+case 'red':
+return Colors.red;
+case 'green':
+return Colors.green;
+case 'blue':
+return Colors.blue;
+case 'black':
+return Colors.black;
+case 'white':
+return Colors.white;
+case 'yellow':
+return Colors.yellow;
+case 'orange':
+return Colors.orange;
+case 'purple':
+return Colors.purple;
+case 'pink':
+return Colors.pink;
+case 'brown':
+return Colors.brown;
+case 'gray':
+return Colors.grey;
+case 'beige':
+return Color(0xFFF5F5DC);
+case 'navy':
+return Color(0xFF001F54);
+case 'turquoise':
+return Color(0xFF40E0D0);
+case 'gold':
+return Color(0xFFFFD700);
+case 'silver':
+return Color(0xFFC0C0C0);
+default:
+return Colors.transparent;
+}
+}
+}           
