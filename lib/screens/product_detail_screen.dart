@@ -51,31 +51,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           context,
           MaterialPageRoute(builder: (_) => HomeScreen()),
         );
-        break;
       case 1:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => MainCategoryScreen()),
         );
-        break;
       case 2:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => CartScreen()),
         );
-        break;
       case 3:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => FavouritesScreen()),
         );
-        break;
       case 4:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => AccountScreen()),
         );
-        break;
     }
   }
 
@@ -204,7 +199,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                     SizedBox(height: 10),
-                    Container(
+                    SizedBox(
                       height: 160,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,

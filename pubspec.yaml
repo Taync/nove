@@ -29,8 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
-  sdk: flutter
-  flutter_slidable: ^3.0.0
+    sdk: flutter
   flutter_bloc: ^9.1.0
   equatable: ^2.0.3
   
@@ -51,7 +50,6 @@ dependencies:
   shared_preferences: 
   random_string: ^2.3.1
   flutter_image_compress: ^2.4.0
-  flutter_slidable: ^2.0.0  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -104,7 +102,7 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 flutter_native_splash:
   color: "#ffffff"
-  image: assets/splash_image.png
+  image: Assets/novesplash.jpg
   android: true
   ios: true
   fullscreen: true
