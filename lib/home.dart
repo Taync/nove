@@ -228,7 +228,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           height: 380,
           child: PageView.builder(
             controller: _pageController,
@@ -287,7 +287,7 @@ class _BannerCarouselState extends State<BannerCarousel> {
 class ProductHorizontalList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 250,
       child: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('Product').snapshots(),
@@ -327,16 +327,17 @@ class ProductHorizontalList extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProductDetailScreen(
-                        images: imageList,
-                        productName: name,
-                        price: price,
-                        description: description,
-                        category: category,
-                        brand: brand,
-                        gender: gender, 
-                        color: '',
-                      ),
+                      builder:
+                          (context) => ProductDetailScreen(
+                            images: imageList,
+                            productName: name,
+                            price: price,
+                            description: description,
+                            category: category,
+                            brand: brand,
+                            gender: gender,
+                            color: '',
+                          ),
                     ),
                   );
                 },
@@ -345,7 +346,9 @@ class ProductHorizontalList extends StatelessWidget {
                   margin: EdgeInsets.symmetric(horizontal: 8),
                   child: Card(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(0), // No rounded corners
+                      borderRadius: BorderRadius.circular(
+                        0,
+                      ), // No rounded corners
                     ),
                     color: Colors.white, // Card color
                     elevation: 2,
@@ -353,16 +356,19 @@ class ProductHorizontalList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: imageList.isNotEmpty
-                              ? Image.memory(
-                                  base64Decode(imageList[0]),
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Center(child: Icon(Icons.broken_image));
-                                  },
-                                )
-                              : Center(child: Icon(Icons.broken_image)),
+                          child:
+                              imageList.isNotEmpty
+                                  ? Image.memory(
+                                    base64Decode(imageList[0]),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(
+                                        child: Icon(Icons.broken_image),
+                                      );
+                                    },
+                                  )
+                                  : Center(child: Icon(Icons.broken_image)),
                         ),
                         Padding(
                           padding: EdgeInsets.all(8),
@@ -403,4 +409,3 @@ class ProductHorizontalList extends StatelessWidget {
     );
   }
 }
-

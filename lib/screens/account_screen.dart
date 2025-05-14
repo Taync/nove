@@ -5,7 +5,6 @@ import 'package:nove_5/Admin/AdminPanelScreen.dart';
 import 'package:nove_5/LoginPage.dart';
 import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
-import 'package:nove_5/screens/category_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/ordersscreen.dart';
 import 'package:nove_5/home.dart';

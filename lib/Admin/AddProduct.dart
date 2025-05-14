@@ -14,7 +14,8 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
-  List<File>? files; // Changed from File? to List<File> to handle multiple images
+  List<File>?
+  files; // Changed from File? to List<File> to handle multiple images
   String? value; // category
   String? selectedBrand;
   String? selectedGender;
@@ -65,7 +66,22 @@ class _AddProductState extends State<AddProduct> {
   ];
 
   final List<String> colorItem = [
-    'Red', 'Green', 'Blue', 'Black', 'White', 'Yellow', 'Orange', 'Purple', 'Pink', 'Brown', 'Gray', 'Beige', 'Navy', 'Turquoise', 'Gold', 'Silver'
+    'Red',
+    'Green',
+    'Blue',
+    'Black',
+    'White',
+    'Yellow',
+    'Orange',
+    'Purple',
+    'Pink',
+    'Brown',
+    'Gray',
+    'Beige',
+    'Navy',
+    'Turquoise',
+    'Gold',
+    'Silver',
   ];
 
   bool showColorPicker = false;
@@ -73,81 +89,81 @@ class _AddProductState extends State<AddProduct> {
   // Function to pick multiple images
   Future getImage() async {
     final ImagePicker picker = ImagePicker();
-    final List<XFile>? images = await picker.pickMultiImage();
+    final List<XFile> images = await picker.pickMultiImage();
     if (images != null && images.isNotEmpty) {
-       List<File> selectedFiles = images.map((image) => File(image.path)).toList();
+      List<File> selectedFiles =
+          images.map((image) => File(image.path)).toList();
       setState(() {
         files = selectedFiles;
       });
     }
   }
 
-void uploadItem() async {
-  if (files != null &&
-      namecontroller.text.isNotEmpty &&
-      value != null &&
-      selectedGender != null &&
-      selectedBrand != null &&
-      selectedColor != null &&  // Check if a color is selected
-      descriptionController.text.isNotEmpty &&
-      priceController.text.isNotEmpty) {
-    
-    String addId = randomAlphaNumeric(10);
+  void uploadItem() async {
+    if (files != null &&
+        namecontroller.text.isNotEmpty &&
+        value != null &&
+        selectedGender != null &&
+        selectedBrand != null &&
+        selectedColor != null && // Check if a color is selected
+        descriptionController.text.isNotEmpty &&
+        priceController.text.isNotEmpty) {
+      String addId = randomAlphaNumeric(10);
 
-    try {
-      List<String> base64Images = [];
+      try {
+        List<String> base64Images = [];
 
-      // Convert images to base64 format
-      for (var image in files!) {
-        final bytes = await image.readAsBytes();
-        base64Images.add(base64Encode(bytes));
+        // Convert images to base64 format
+        for (var image in files!) {
+          final bytes = await image.readAsBytes();
+          base64Images.add(base64Encode(bytes));
+        }
+
+        // Add product details to Firestore
+        await FirebaseFirestore.instance.collection("Product").doc(addId).set({
+          'name': namecontroller.text,
+          'category': value,
+          'brand': selectedBrand,
+          'gender': selectedGender,
+          'description': descriptionController.text,
+          'price': double.tryParse(priceController.text) ?? 0.0,
+          'color': selectedColor, // Include the selected color
+          'imageBase64': base64Images,
+          'id': addId,
+        });
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Product added successfully")));
+
+        // Clear the form
+        namecontroller.clear();
+        priceController.clear();
+        descriptionController.clear();
+        setState(() {
+          files = null;
+          value = null;
+          selectedGender = null;
+          selectedBrand = null;
+          selectedColor = null; // Reset color selection
+          imageLinks = [];
+        });
+        imageLinkController.clear();
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Upload failed: $e")));
       }
-
-      // Add product details to Firestore
-      await FirebaseFirestore.instance.collection("Product").doc(addId).set({
-        'name': namecontroller.text,
-        'category': value,
-        'brand': selectedBrand,
-        'gender': selectedGender,
-        'description': descriptionController.text,
-        'price': double.tryParse(priceController.text) ?? 0.0,
-        'color': selectedColor, // Include the selected color
-        'imageBase64': base64Images,
-        'id': addId,
-      });
-
+    } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Product added successfully")));
-
-      // Clear the form
-      namecontroller.clear();
-      priceController.clear();
-      descriptionController.clear();
-      setState(() {
-        files = null;
-        value = null;
-        selectedGender = null;
-        selectedBrand = null;
-        selectedColor = null; // Reset color selection
-        imageLinks = [];
-      });
-      imageLinkController.clear();
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Upload failed: $e")));
+      ).showSnackBar(SnackBar(content: Text("Please fill all fields")));
     }
-  } else {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text("Please fill all fields")));
   }
-}
-
 
   void addStockToAllProducts() async {
-    final products = await FirebaseFirestore.instance.collection('Product').get();
+    final products =
+        await FirebaseFirestore.instance.collection('Product').get();
     for (var doc in products.docs) {
       final int stock = doc.data()['stock'] ?? 0;
       await doc.reference.update({'stock': stock});
@@ -193,7 +209,9 @@ void uploadItem() async {
                     width: 100,
                     height: 100,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
+                    errorBuilder:
+                        (context, error, stackTrace) =>
+                            Icon(Icons.broken_image),
                   );
                 },
               ),
@@ -245,7 +263,10 @@ void uploadItem() async {
                       Text(
                         selectedColor ?? "Select Color",
                         style: TextStyle(
-                          color: selectedColor == null ? Colors.grey : Colors.black,
+                          color:
+                              selectedColor == null
+                                  ? Colors.grey
+                                  : Colors.black,
                           fontSize: 16,
                         ),
                       ),
@@ -257,32 +278,41 @@ void uploadItem() async {
             else
               Wrap(
                 spacing: 10,
-                children: colorItem.map((color) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedColor = color;
-                        showColorPicker = false;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: selectedColor == color ? Colors.black : Colors.transparent,
-                          width: 2,
+                children:
+                    colorItem.map((color) {
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedColor = color;
+                            showColorPicker = false;
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color:
+                                  selectedColor == color
+                                      ? Colors.black
+                                      : Colors.transparent,
+                              width: 2,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            backgroundColor: _getColorFromName(color),
+                            radius: 16,
+                            child:
+                                selectedColor == color
+                                    ? Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 18,
+                                    )
+                                    : null,
+                          ),
                         ),
-                      ),
-                      child: CircleAvatar(
-                        backgroundColor: _getColorFromName(color),
-                        radius: 16,
-                        child: selectedColor == color
-                            ? Icon(Icons.check, color: Colors.white, size: 18)
-                            : null,
-                      ),
-                    ),
-                  );
-                }).toList(),
+                      );
+                    }).toList(),
               ),
             SizedBox(height: 20),
 

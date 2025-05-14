@@ -37,6 +37,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int _currentImageIndex = 0;
   int _selectedIndex = 0;
   String? _selectedSize;
+  bool _isFavourite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfFavourite();
+  }
 
   void _onNavTap(int index) {
     setState(() {
@@ -77,6 +84,67 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 
+  Future<void> _checkIfFavourite() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .collection('favourites')
+              .where('productName', isEqualTo: widget.productName)
+              .get();
+
+      setState(() {
+        _isFavourite = snapshot.docs.isNotEmpty;
+      });
+    }
+  }
+
+  Future<void> _toggleFavourite() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please sign in.")));
+      return;
+    }
+
+    final favRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('favourites');
+
+    final existing =
+        await favRef.where('productName', isEqualTo: widget.productName).get();
+
+    if (existing.docs.isNotEmpty) {
+      for (var doc in existing.docs) {
+        await doc.reference.delete();
+      }
+      setState(() {
+        _isFavourite = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Removed from favourites")));
+    } else {
+      await favRef.add({
+        'productName': widget.productName,
+        'price': widget.price,
+        'color': widget.color,
+        'image': widget.images.isNotEmpty ? widget.images[0] : '',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+      setState(() {
+        _isFavourite = true;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Added to favourites")));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double imageHeight = MediaQuery.of(context).size.height * 0.6;
@@ -92,6 +160,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           SliverAppBar(
             expandedHeight: imageHeight,
             pinned: true,
+            actions: [
+              IconButton(
+                icon: Icon(
+                  _isFavourite ? Icons.favorite : Icons.favorite_border,
+                  color: _isFavourite ? Colors.red : Colors.black,
+                ),
+                onPressed: _toggleFavourite,
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: PageView.builder(
                 itemCount: widget.images.length,
@@ -183,7 +260,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             return ChoiceChip(
                               label: Text(size),
                               selected: isSelected,
-                              onSelected: (bool selected) {
+                              onSelected: (selected) {
                                 setState(() {
                                   _selectedSize = selected ? size : null;
                                 });
@@ -301,6 +378,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               .doc(user.uid)
                               .collection('cart')
                               .get();
+
                       final cartCount = cartSnapshot.docs.length;
 
                       ScaffoldMessenger.of(context).showSnackBar(
