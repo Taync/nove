@@ -11,8 +11,9 @@ class UserManagementScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: usersRef.snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
+          }
 
           final users = snapshot.data!.docs;
 

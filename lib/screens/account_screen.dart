@@ -291,8 +291,8 @@ class _MainButton extends StatelessWidget {
         children: [
           CircleAvatar(
             backgroundColor: Colors.black87,
-            child: Icon(icon, color: Colors.white),
             radius: 24,
+            child: Icon(icon, color: Colors.white),
           ),
           SizedBox(height: 6),
           Text(label, style: TextStyle(fontWeight: FontWeight.w500)),

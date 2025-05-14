@@ -6,10 +6,10 @@ class SubSubCategoryScreen extends StatelessWidget {
   final List<String> subcategories;
 
   const SubSubCategoryScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.subcategories,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

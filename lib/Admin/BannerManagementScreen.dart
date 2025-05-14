@@ -11,8 +11,9 @@ class BannerManagementScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: bannersRef.snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
+          }
 
           final banners = snapshot.data!.docs;
 

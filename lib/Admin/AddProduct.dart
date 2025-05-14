@@ -82,24 +82,28 @@ class _AddProductState extends State<AddProduct> {
     }
   }
 
-  void uploadItem() async {
+void uploadItem() async {
   if (files != null &&
       namecontroller.text.isNotEmpty &&
       value != null &&
       selectedGender != null &&
       selectedBrand != null &&
+      selectedColor != null &&  // Check if a color is selected
       descriptionController.text.isNotEmpty &&
       priceController.text.isNotEmpty) {
+    
     String addId = randomAlphaNumeric(10);
 
     try {
       List<String> base64Images = [];
 
+      // Convert images to base64 format
       for (var image in files!) {
         final bytes = await image.readAsBytes();
         base64Images.add(base64Encode(bytes));
       }
 
+      // Add product details to Firestore
       await FirebaseFirestore.instance.collection("Product").doc(addId).set({
         'name': namecontroller.text,
         'category': value,
@@ -107,36 +111,40 @@ class _AddProductState extends State<AddProduct> {
         'gender': selectedGender,
         'description': descriptionController.text,
         'price': double.tryParse(priceController.text) ?? 0.0,
+        'color': selectedColor, // Include the selected color
         'imageBase64': base64Images,
         'id': addId,
       });
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Product added successfully")));
-
-        namecontroller.clear();
-        priceController.clear();
-        descriptionController.clear();
-        setState(() {
-          files = null;
-          value = null;
-          selectedGender = null;
-          selectedBrand = null;
-          imageLinks = [];
-        });
-        imageLinkController.clear();
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Upload failed: $e")));
-      }
-    } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("Please fill all fields")));
+      ).showSnackBar(SnackBar(content: Text("Product added successfully")));
+
+      // Clear the form
+      namecontroller.clear();
+      priceController.clear();
+      descriptionController.clear();
+      setState(() {
+        files = null;
+        value = null;
+        selectedGender = null;
+        selectedBrand = null;
+        selectedColor = null; // Reset color selection
+        imageLinks = [];
+      });
+      imageLinkController.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Upload failed: $e")));
     }
+  } else {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text("Please fill all fields")));
   }
+}
+
 
   void addStockToAllProducts() async {
     final products = await FirebaseFirestore.instance.collection('Product').get();
@@ -161,50 +169,6 @@ class _AddProductState extends State<AddProduct> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Add Image Link"),
-            Row(
-              children: [
-                Expanded(
-                  child: buildInput(imageLinkController, hint: "Paste image URL here"),
-                ),
-                SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    final link = imageLinkController.text.trim();
-                    if (link.isNotEmpty) {
-                      setState(() {
-                        imageLinks.add(link);
-                        imageLinkController.clear();
-                      });
-                    }
-                  },
-                  child: Text("Add Link"),
-                ),
-              ],
-            ),
-            if (imageLinks.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: imageLinks.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Image.network(
-                          imageLinks[index],
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
             Center(
               child: MaterialButton(
                 color: Colors.blue,
@@ -412,7 +376,7 @@ class _AddProductState extends State<AddProduct> {
   Color _getColorFromName(String colorName) {
     switch (colorName.toLowerCase()) {
       case 'red':
-        return Colors.red;
+        return const Color.fromARGB(255, 255, 0, 0);
       case 'green':
         return Colors.green;
       case 'blue':

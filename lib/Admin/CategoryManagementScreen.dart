@@ -64,8 +64,9 @@ class _CategoryManagementScreenState extends State<CategoryManagementScreen> {
                       .orderBy('createdAt')
                       .snapshots(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData)
+                if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator());
+                }
 
                 final docs = snapshot.data!.docs;
                 return ListView.builder(

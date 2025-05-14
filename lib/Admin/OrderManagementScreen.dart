@@ -11,8 +11,9 @@ class OrderManagementScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: ordersRef.orderBy('createdAt', descending: true).snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
+          }
 
           final orders = snapshot.data!.docs;
 
