@@ -174,9 +174,9 @@ return InkWell(
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: data['imageBase64'] != null
+                              child: data['image'] != null
                                   ? Image.memory(
-                                      base64Decode(data['imageBase64']),
+                                      base64Decode(data['image']),
                                       width: 90,
                                       height: 110,
                                       fit: BoxFit.cover,
