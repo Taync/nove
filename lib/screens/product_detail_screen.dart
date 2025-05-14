@@ -6,12 +6,10 @@ import 'package:nove_5/home.dart';
 import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/account_screen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
-import 'package:nove_5/screens/category_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
-import 'package:nove_5/screens/Product.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  final List<String> images;
+  final List<String> images; // Base64 images
   final String productName;
   final String price;
   final String description;
@@ -51,26 +49,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           context,
           MaterialPageRoute(builder: (_) => HomeScreen()),
         );
+        break;
       case 1:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => MainCategoryScreen()),
         );
+        break;
       case 2:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => CartScreen()),
         );
+        break;
       case 3:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => FavouritesScreen()),
         );
+        break;
       case 4:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => AccountScreen()),
         );
+        break;
     }
   }
 
@@ -80,13 +83,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final isShoesCategory = widget.category.toLowerCase() == 'shoes';
     final sizeOptions =
         isShoesCategory
-            ? List<String>.generate(10, (i) => (36 + i).toString()) // 36–45
+            ? List<String>.generate(10, (i) => (36 + i).toString())
             : ['S', 'M', 'L', 'XL'];
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // SliverAppBar for product image
           SliverAppBar(
             expandedHeight: imageHeight,
             pinned: true,
@@ -99,21 +101,24 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   });
                 },
                 itemBuilder: (context, index) {
-                  return Image.network(
-                    widget.images[index],
-                    fit: BoxFit.contain,
-                    width: double.infinity,
-                    errorBuilder:
-                        (_, __, ___) => Icon(Icons.broken_image, size: 150),
-                  );
+                  try {
+                    final imageBytes = base64Decode(widget.images[index]);
+                    return Image.memory(
+                      imageBytes,
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      errorBuilder:
+                          (_, __, ___) => Icon(Icons.broken_image, size: 150),
+                    );
+                  } catch (e) {
+                    return Center(child: Icon(Icons.error));
+                  }
                 },
               ),
             ),
           ),
-          // Product content
           SliverList(
             delegate: SliverChildListDelegate([
-              // Page indicators
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
@@ -155,10 +160,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    // Color row
                     Row(
                       children: [
-                        Text('Color: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          'Color: ',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         Text(widget.color),
                       ],
                     ),
@@ -220,12 +227,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ],
       ),
-
-      // Add to Cart Button
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Add to Cart Button
           Container(
             color: Colors.white,
             padding: EdgeInsets.fromLTRB(20, 16, 20, 16),
@@ -251,19 +255,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       return;
                     }
 
-                    // Check if product already exists in cart
-                    final cartQuery = await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(user.uid)
-                        .collection('cart')
-                        .where('productName', isEqualTo: widget.productName)
-                        .where('size', isEqualTo: _selectedSize)
-                        .where('color', isEqualTo: widget.color)
-                        .get();
+                    final cartQuery =
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user.uid)
+                            .collection('cart')
+                            .where('productName', isEqualTo: widget.productName)
+                            .where('size', isEqualTo: _selectedSize)
+                            .where('color', isEqualTo: widget.color)
+                            .get();
 
                     if (cartQuery.docs.isNotEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("This product is already in your cart.")),
+                        SnackBar(
+                          content: Text(
+                            "This product is already in your cart.",
+                          ),
+                        ),
                       );
                       return;
                     }
@@ -287,12 +295,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             'quantity': 1,
                           });
 
-                      // Get the updated cart count
-                      final cartSnapshot = await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(user.uid)
-                          .collection('cart')
-                          .get();
+                      final cartSnapshot =
+                          await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(user.uid)
+                              .collection('cart')
+                              .get();
                       final cartCount = cartSnapshot.docs.length;
 
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -324,8 +332,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
             ),
           ),
-
-          // Bottom Navigation Bar
           BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: _selectedIndex,
