@@ -162,8 +162,114 @@ return InkWell(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
+<<<<<<< HEAD
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
+=======
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: data['imageBase64'] != null
+                                  ? Image.memory(
+                                      base64Decode(data['imageBase64']),
+                                      width: 90,
+                                      height: 110,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          Icon(Icons.broken_image, size: 40),
+                                    )
+                                  : Container(
+                                      width: 90,
+                                      height: 110,
+                                      color: Colors.grey[300],
+                                      child: Icon(Icons.image, size: 40),
+                                    ),
+                            ),
+                            SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          data['productName'] ?? '-',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.delete),
+                                        onPressed: () {
+                                          item.reference.delete();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text('Color: $color | Size: $size'),
+                                  SizedBox(height: 4),
+                                  Container(
+                                    width: 160,
+                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<int>(
+                                        value: quantity,
+                                        isExpanded: true,
+                                        icon: Icon(Icons.keyboard_arrow_down),
+                                        items: List.generate(10, (i) => i + 1)
+                                            .map((q) => DropdownMenuItem(
+                                                  value: q,
+                                                  child: Text('$q Quantity'),
+                                                ))
+                                            .toList(),
+                                        onChanged: (newQty) {
+                                          if (newQty != null) {
+                                            item.reference.update({'quantity': newQty});
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    '₺${data['price']}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Checkbox(
+                                        value: gift,
+                                        onChanged: (val) {
+                                          if (val != null) {
+                                            item.reference.update({'gift': val});
+                                          }
+                                        },
+                                      ),
+                                      Text('I want a gift package'),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+>>>>>>> 340e2e02c55acd0e4154df6d6c5e6d1effb1a535
                         ),
                       ),
                       SizedBox(width: 6),
