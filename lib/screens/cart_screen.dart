@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nove_5/home.dart';
 import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/account_screen.dart';
 import 'package:nove_5/screens/product_detail_screen.dart';
+import 'package:nove_5/home.dart';
 
 class CartScreen extends StatefulWidget {
   @override
@@ -48,13 +48,12 @@ class _CartScreenState extends State<CartScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("My Cart"), automaticallyImplyLeading: false),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance
-                .collection('users')
-                .doc(user.uid)
-                .collection('cart')
-                .orderBy('timestamp', descending: true)
-                .snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('cart')
+            .orderBy('timestamp', descending: true)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('There was an error: ${snapshot.error}'));
@@ -100,17 +99,16 @@ class _CartScreenState extends State<CartScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (_) => ProductDetailScreen(
-                                  images: [data['image'] ?? ''],
-                                  productName: data['productName'] ?? '-',
-                                  price: data['price'] ?? '-',
-                                  description: data['description'] ?? '-',
-                                  brand: data['brand'] ?? '-',
-                                  category: data['category'] ?? '-',
-                                  gender: data['gender'] ?? '-',
-                                  color: color,
-                                ),
+                            builder: (_) => ProductDetailScreen(
+                              images: [data['image'] ?? ''],
+                              productName: data['productName'] ?? '-',
+                              price: data['price'] ?? '-',
+                              description: data['description'] ?? '-',
+                              brand: data['brand'] ?? '-',
+                              category: data['category'] ?? '-',
+                              gender: data['gender'] ?? '-',
+                              color: color,
+                            ),
                           ),
                         );
                       },
@@ -120,25 +118,7 @@ class _CartScreenState extends State<CartScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child:
-                                  data['imageBase64'] != null
-                                      ? Image.memory(
-                                        base64Decode(data['imageBase64']),
-                                        width: 90,
-                                        height: 110,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (a, _, __) => Icon(
-                                              Icons.broken_image,
-                                              size: 40,
-                                            ),
-                                      )
-                                      : Container(
-                                        width: 90,
-                                        height: 110,
-                                        color: Colors.grey[300],
-                                        child: Icon(Icons.image, size: 40),
-                                      ),
+                              child: _buildCartItemImage(data),
                             ),
                             SizedBox(width: 12),
                             Expanded(
@@ -185,15 +165,14 @@ class _CartScreenState extends State<CartScreen> {
                                         value: quantity,
                                         isExpanded: true,
                                         icon: Icon(Icons.keyboard_arrow_down),
-                                        items:
-                                            List.generate(10, (i) => i + 1)
-                                                .map(
-                                                  (q) => DropdownMenuItem(
-                                                    value: q,
-                                                    child: Text('$q Quantity'),
-                                                  ),
-                                                )
-                                                .toList(),
+                                        items: List.generate(10, (i) => i + 1)
+                                            .map(
+                                              (q) => DropdownMenuItem(
+                                                value: q,
+                                                child: Text('$q Quantity'),
+                                              ),
+                                            )
+                                            .toList(),
                                         onChanged: (newQty) {
                                           if (newQty != null) {
                                             item.reference.update({
@@ -365,5 +344,25 @@ class _CartScreenState extends State<CartScreen> {
         ],
       ),
     );
+  }
+
+  // Function to build the image for cart item (handling only Base64)
+  Widget _buildCartItemImage(Map<String, dynamic> data) {
+    String imageBase64 = data['image'] ?? ''; // Image field is Base64 encoded
+
+    try {
+      final imageBytes = base64Decode(imageBase64);
+      return Image.memory(
+        imageBytes,
+        width: 90,
+        height: 90,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Icon(Icons.broken_image); // Show broken image icon on error
+        },
+      );
+    } catch (e) {
+      return Icon(Icons.error, size: 60); // Show error icon if decoding fails
+    }
   }
 }
