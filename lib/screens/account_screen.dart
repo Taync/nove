@@ -3,11 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nove_5/Admin/AdminPanelScreen.dart';
 import 'package:nove_5/LoginPage.dart';
+import 'package:nove_5/home.dart';
 import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/ordersscreen.dart';
-import 'package:nove_5/home.dart';
+import 'package:nove_5/screens/theme_provider.dart';
+import 'package:nove_5/screens/themes_screen.dart';
+import 'package:provider/provider.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -28,11 +31,10 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> fetchUserData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final doc =
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(user.uid)
-              .get();
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
       final data = doc.data();
       if (data != null) {
         setState(() {
@@ -48,7 +50,7 @@ class _AccountScreenState extends State<AccountScreen> {
     await FirebaseAuth.instance.signOut();
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => AuthGate()),
+      MaterialPageRoute(builder: (context) => AuthGate()), // Update this to your LoginPage widget
       (route) => false,
     );
   }
@@ -77,8 +79,11 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = themeProvider.isDarkMode;
+
     return Scaffold(
-      appBar: null,
+      appBar: AppBar(title: Text("Account")),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,6 +229,16 @@ class _AccountScreenState extends State<AccountScreen> {
                   );
                 },
               ),
+            _PushableListTile(
+              icon: Icons.color_lens_outlined,
+              label: 'Themes',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ThemesScreen()),
+                );
+              },
+            ),
             _PushableListTile(
               icon: Icons.logout,
               label: 'Log Out',

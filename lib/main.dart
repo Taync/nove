@@ -1,24 +1,35 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';   
-import 'package:nove_5/firebase_options.dart';
-import 'loginpage.dart';
+import 'package:flutter/material.dart';
+import 'package:nove_5/loginpage.dart';
+import 'package:provider/provider.dart';
+import 'screens/theme_provider.dart'; // Import ThemeProvider
+import 'screens/themes_screen.dart'; // Import the ThemesScreen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  await Firebase.initializeApp();
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    // Access the ThemeProvider to set the current theme
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home:
-          const AuthGate(), //ddProduct olarak değiştirerek admin ürün eklemeye geçebilirsin
+      debugShowCheckedModeBanner: false,
+      theme: ThemeProvider.lightTheme,
+      darkTheme: ThemeProvider.darkTheme,
+      themeMode: themeProvider.themeMode, // Use the current theme mode
+      home: AuthGate(), // Navigate to ThemesScreen
     );
   }
 }

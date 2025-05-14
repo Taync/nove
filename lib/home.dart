@@ -10,9 +10,11 @@ import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/category_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/product_detail_screen.dart';
+import 'package:nove_5/screens/theme_provider.dart';
 import 'package:nove_5/splash_screen.dart';
 import 'dart:async';
 import 'package:nove_5/screens/ordersscreen.dart';
+import 'package:provider/provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,19 +71,30 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context); // Get the current theme
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: Text('NOVE'),
-        titleTextStyle: TextStyle(
-          color: Color.fromRGBO(0, 50, 97, 1),
-          fontWeight: FontWeight.bold,
-          fontSize: 30,
+        title: Text(
+          'NOVE',
+          style: TextStyle(
+            color: themeProvider.isDarkMode ? Colors.white : Color.fromRGBO(0, 50, 97, 1),
+            fontWeight: FontWeight.bold,
+            fontSize: 30,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -93,14 +106,19 @@ class HomeScreen extends StatelessWidget {
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'Search For Brand,Category',
-                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  prefixIcon: Icon(Icons.search, color: themeProvider.isDarkMode ? Colors.white : Colors.grey),
                   filled: true,
-                  fillColor: Colors.grey[300],
+                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
                 ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value.toLowerCase(); // Case-insensitive search
+                  });
+                },
               ),
             ),
             SizedBox(height: 10),
@@ -116,15 +134,16 @@ class HomeScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
+                        color: themeProvider.isDarkMode ? Colors.white : Colors.black,
                       ),
                     ),
                   ),
-                  Divider(color: Colors.black, thickness: 2),
+                  Divider(color: themeProvider.isDarkMode ? Colors.white : Colors.black, thickness: 2),
                 ],
               ),
             ),
             SizedBox(height: 10),
-            ProductHorizontalList(),
+            ProductHorizontalList(searchQuery: _searchQuery),
           ],
         ),
       ),
@@ -153,6 +172,9 @@ class HomeScreen extends StatelessWidget {
             );
           }
         },
+        backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white, // Bottom nav bar color
+        selectedItemColor: themeProvider.isDarkMode ? Colors.white : Colors.black,
+        unselectedItemColor: themeProvider.isDarkMode ? Colors.grey : Colors.black54,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -179,6 +201,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
 
 class BannerCarousel extends StatefulWidget {
   @override
@@ -285,6 +308,8 @@ class _BannerCarouselState extends State<BannerCarousel> {
 }
 
 class ProductHorizontalList extends StatelessWidget {
+   final String searchQuery;
+   ProductHorizontalList({required this.searchQuery});
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -300,13 +325,21 @@ class ProductHorizontalList extends StatelessWidget {
             return Center(child: Text("No products available."));
           }
 
-          final products = snapshot.data!.docs;
+          final allProducts = snapshot.data!.docs;
 
+          final filteredProducts = allProducts.where((product) {
+            final name = product['name']?.toString().toLowerCase() ?? '';
+            final brand = product['brand']?.toString().toLowerCase() ?? '';
+            final category = product['category']?.toString().toLowerCase() ?? '';
+            return name.contains(searchQuery) ||
+                  brand.contains(searchQuery) ||
+                  category.contains(searchQuery);
+          }).toList();
           return ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: products.length,
+            itemCount: filteredProducts.length,
             itemBuilder: (context, index) {
-              final product = products[index];
+              final product = filteredProducts[index];
               final name = product['name'] ?? 'No name';
               final price = product['price']?.toString() ?? '0.00';
               final imagesData = product['imageBase64'];
