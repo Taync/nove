@@ -19,7 +19,7 @@ class MainCategoryScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => SubCategoryScreen(gender: 'female'),
+                  builder: (_) => SubCategoryScreen(gender: 'Women'),
                 ),
               );
             },
@@ -54,7 +54,7 @@ class MainCategoryScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => SubCategoryScreen(gender: 'male'),
+                  builder: (_) => SubCategoryScreen(gender: 'Man'),
                 ),
               );
             },
@@ -90,7 +90,7 @@ class MainCategoryScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => SubCategoryScreen(gender: 'MEN'),
+                  builder: (_) => SubCategoryScreen(gender: 'MAN'),
                 ),
               );
             },

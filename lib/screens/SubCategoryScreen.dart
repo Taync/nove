@@ -9,7 +9,7 @@ class SubCategoryScreen extends StatelessWidget {
 
   final List<Map<String, dynamic>> categories = [
     {
-      'title': 'All Products',
+      'title': 'All Clothing',
       'image': 'https://via.placeholder.com/100', // Replace with real URL
       'category': 'all',
     },
@@ -100,17 +100,17 @@ class SubCategoryScreen extends StatelessWidget {
             title: Text(item['title']),
             trailing: Icon(Icons.chevron_right),
             onTap: () async {
-              if (item['title'] == 'Clothing' || item['title'] == 'Accessories') {
+              if (item['title'] == 'Clothing' ||
+                  item['title'] == 'Accessories') {
                 final genderLower = gender.toLowerCase();
                 final isMale =
-                    genderLower.contains('male') ||
-                    genderLower.contains('erkek');
+                    genderLower.contains('Man') || genderLower.contains('Men');
                 final isFemale =
-                    genderLower.contains('female') ||
+                    genderLower.contains('Women') ||
                     genderLower.contains('kadın') ||
                     genderLower.contains('kadin');
                 final isKids =
-                    genderLower.contains('kids') ||
+                    genderLower.contains('Kids') ||
                     genderLower.contains('çocuk');
                 List<String> subcategories;
                 if (item['title'] == 'Clothing') {
