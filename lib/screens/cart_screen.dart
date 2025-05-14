@@ -117,9 +117,9 @@ class _CartScreenState extends State<CartScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: data['image'] != null
+                              child: data['imageBase64'] != null
                                   ? Image.memory(
-                                      base64Decode(data['image']),
+                                      base64Decode(data['imageBase64']),
                                       width: 90,
                                       height: 110,
                                       fit: BoxFit.cover,
