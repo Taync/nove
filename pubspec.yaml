@@ -50,8 +50,7 @@ dependencies:
   uuid: ^4.4.2
   shared_preferences: 
   random_string: ^2.3.1
-  flutter_image_compress: ^2.4.0
-  flutter_slidable: ^2.0.0  
+  flutter_image_compress: ^2.4.0 
 dev_dependencies:
   flutter_test:
     sdk: flutter
