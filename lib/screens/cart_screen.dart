@@ -7,6 +7,7 @@ import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/account_screen.dart';
 import 'package:nove_5/screens/product_detail_screen.dart';
 import 'package:nove_5/home.dart';
+import 'package:nove_5/screens/checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   @override
@@ -246,7 +247,10 @@ class _CartScreenState extends State<CartScreen> {
                   height: 48,
                   child: ElevatedButton(
                     onPressed: () {
-                      // TODO: Implement buy action
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => CheckoutScreen()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
