@@ -86,7 +86,7 @@ class _CartScreenState extends State<CartScreen> {
               Expanded(
                 child: ListView.separated(
                   itemCount: cartItems.length,
-                  separatorBuilder: (a, _) => Divider(),
+                  separatorBuilder: (_, __) => Divider(),
                   itemBuilder: (context, index) {
                     final item = cartItems[index];
                     final data = item.data() as Map<String, dynamic>;
@@ -150,41 +150,51 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                   SizedBox(height: 4),
                                   Text('Color: $color | Size: $size'),
-                                  SizedBox(height: 4),
-                                  Container(
-                                    width: 160,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton<int>(
-                                        value: quantity,
-                                        isExpanded: true,
-                                        icon: Icon(Icons.keyboard_arrow_down),
-                                        items: List.generate(10, (i) => i + 1)
-                                            .map(
-                                              (q) => DropdownMenuItem(
-                                                value: q,
-                                                child: Text('$q Quantity'),
-                                              ),
-                                            )
-                                            .toList(),
-                                        onChanged: (newQty) {
-                                          if (newQty != null) {
-                                            item.reference.update({
-                                              'quantity': newQty,
-                                            });
-                                          }
-                                        },
+                                  SizedBox(height: 6),
+
+                                  // ✅ Improved Quantity Selector
+                                  Row(
+                                    children: [
+                                      Text("Quantity", style: TextStyle(fontWeight: FontWeight.bold)),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(color: Colors.grey),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(Icons.remove, size: 20),
+                                              onPressed: quantity > 1
+                                                  ? () {
+                                                      item.reference.update({
+                                                        'quantity': quantity - 1,
+                                                      });
+                                                    }
+                                                  : null,
+                                            ),
+                                            Text(
+                                              '$quantity',
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.add, size: 20),
+                                              onPressed: quantity < 10
+                                                  ? () {
+                                                      item.reference.update({
+                                                        'quantity': quantity + 1,
+                                                      });
+                                                    }
+                                                  : null,
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                  SizedBox(height: 4),
+
+                                  SizedBox(height: 6),
                                   Text(
                                     '₺${data['price']}',
                                     style: TextStyle(
@@ -287,7 +297,6 @@ class _CartScreenState extends State<CartScreen> {
                 (route) => false,
               );
             case 2:
-              // Already on Cart, do nothing
               break;
             case 3:
               Navigator.pushAndRemoveUntil(
@@ -325,48 +334,45 @@ class _CartScreenState extends State<CartScreen> {
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      constraints: BoxConstraints(minWidth: 16, minHeight: 16),
-                      child: Text(
-                        '$_cartCount',
-                        style: TextStyle(color: Colors.white, fontSize: 10),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-              ],
+                      constraints: BoxConstraints(minWidth: 16, minHeight:16),
+                child: Text(
+                '$_cartCount',
+                style: TextStyle(color: Colors.white, fontSize: 10),
+                textAlign: TextAlign.center,
+                ),
+               ),
+              ),
+            ],
+          ),
+        label: 'Cart',
+           ),
+           BottomNavigationBarItem(
+           icon: Icon(Icons.favorite_outline),
+         label: 'Favorites',
+           ),
+           BottomNavigationBarItem(
+           icon: Icon(Icons.person_outline),
+         label: 'Account',
             ),
-            label: 'Cart',
+           ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Account',
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Function to build the image for cart item (handling only Base64)
+         );
+       }
   Widget _buildCartItemImage(Map<String, dynamic> data) {
-    String imageBase64 = data['image'] ?? ''; // Image field is Base64 encoded
-
-    try {
-      final imageBytes = base64Decode(imageBase64);
-      return Image.memory(
-        imageBytes,
-        width: 90,
-        height: 90,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Icon(Icons.broken_image); // Show broken image icon on error
-        },
-      );
-    } catch (e) {
-      return Icon(Icons.error, size: 60); // Show error icon if decoding fails
-    }
+  String imageBase64 = data['image'] ?? ''; // Image field is Base64 encoded
+  try {
+    final imageBytes = base64Decode(imageBase64);
+    return Image.memory(
+      imageBytes,
+      width: 90,
+      height: 90,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Icon(Icons.broken_image); // Show broken image icon on error
+      },
+    );
+  } catch (e) {
+    return Icon(Icons.error, size: 60); // Show error icon if decoding fails
+   }
   }
 }

@@ -85,13 +85,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
-        elevation: 0,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        elevation: 0, // Keeps it flat; remove if you want a shadow
         centerTitle: true,
         title: Text(
           'NOVE',
           style: TextStyle(
-            color: themeProvider.isDarkMode ? Colors.white : Color.fromRGBO(0, 50, 97, 1),
+            color: Theme.of(context).appBarTheme.foregroundColor,
             fontWeight: FontWeight.bold,
             fontSize: 30,
           ),
@@ -383,7 +383,7 @@ class ProductHorizontalList extends StatelessWidget {
                         0,
                       ), // No rounded corners
                     ),
-                    color: Colors.white, // Card color
+                    color: Theme.of(context).cardColor,
                     elevation: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
