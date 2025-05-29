@@ -36,34 +36,49 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     super.dispose();
   }
 
-  Future<void> _clearCartAndNavigate() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final cartRef = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('cart');
+ Future<void> _clearCartAndNavigate() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final cartRef = userRef.collection('cart');
+    final ordersRef = userRef.collection('orders');
 
-      final cartSnapshot = await cartRef.get();
+    final cartSnapshot = await cartRef.get();
 
-      // Delete all items from cart
-      for (var doc in cartSnapshot.docs) {
-        await doc.reference.delete();
-      }
-
-      // Navigate to HomeScreen after clearing cart
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => HomeScreen()),
-        (route) => false, // This removes all the previous routes in the stack
-      );
-
-      // Optional: show a message
+    if (cartSnapshot.docs.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('There was an error, all of the products were removed from your cart!')),
+        SnackBar(content: Text('Your cart is empty.')),
       );
+      return;
     }
+
+    final timestamp = DateTime.now();
+
+    // Add each cart item to the orders collection with timestamp
+    for (var doc in cartSnapshot.docs) {
+      final itemData = doc.data(); // this includes imageBase64
+      await ordersRef.add({
+        ...itemData,
+        'purchasedAt': timestamp,
+        'isGift': _isGift,
+        'buyerName': _nameController.text,
+      });
+            // Delete the item from the cart
+      await doc.reference.delete();
+    }
+
+    // Navigate to HomeScreen after clearing cart
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => HomeScreen()),
+      (route) => false,
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('The products have been successfully added to your orders.')),
+    );
   }
+}
 
   Future<void> _selectExpiryDate(BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
