@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +56,7 @@ class OrdersScreen extends StatelessWidget {
 
     // Handle base64 image
     List<String> imageList = [];
-    final imagesData = order['imageBase64'];
+    final imagesData = order['image'];
 
     if (imagesData is List) {
       imageList = imagesData.cast<String>();

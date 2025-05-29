@@ -363,10 +363,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             'price': widget.price,
                             'size': _selectedSize,
                             'color': widget.color,
-                            'image':
-                                widget.images.isNotEmpty
-                                    ? widget.images[0]
-                                    : '',
+                            'image': widget.images,
                             'timestamp': FieldValue.serverTimestamp(),
                             'gift': false,
                             'quantity': 1,
