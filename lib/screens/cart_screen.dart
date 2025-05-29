@@ -109,8 +109,8 @@ class _CartScreenState extends State<CartScreen> {
                           MaterialPageRoute(
                             builder: (_) => ProductDetailScreen(
                               images: (data['image'] is List)
-                            ? List<String>.from(data['image'])
-                            : [data['image'] ?? ''],
+                                  ? List<String>.from(data['image'])
+                                  : [data['image'] ?? ''],
                               productName: data['productName'] ?? '-',
                               price: data['price'] ?? '-',
                               description: data['description'] ?? '-',

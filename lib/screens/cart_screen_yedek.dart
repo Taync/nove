@@ -212,3 +212,22 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 }
+//onTap: () {
+//  Navigator.push(
+//    context,
+//     MaterialPageRoute(
+//      builder: (_) => ProductDetailScreen(
+//         images: (data['image'] is List)
+//             ? List<String>.from(data['image'])
+//             : [data['image'] ?? ''],
+//         productName: data['productName'] ?? '-',
+//         price: data['price'] ?? '-',
+//         description: data['description'] ?? '-',
+//         brand: data['brand'] ?? '-',
+//         category: data['category'] ?? '-',
+//         gender: data['gender'] ?? '-',
+//         color: color,
+//       ),
+//     ),
+//   );
+// },

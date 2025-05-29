@@ -133,7 +133,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         'productName': widget.productName,
         'price': widget.price,
         'color': widget.color,
-        'image': widget.images.isNotEmpty ? widget.images[0] : '',
+        'image': widget.images,
         'timestamp': FieldValue.serverTimestamp(),
       });
       setState(() {
