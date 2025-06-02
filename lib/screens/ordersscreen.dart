@@ -3,9 +3,55 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:nove_5/screens/product_detail_screen.dart'; // Adjust the import path if needed
+import 'package:nove_5/screens/product_detail_screen.dart'; // Adjust import if needed
 
 class OrdersScreen extends StatelessWidget {
+  Future<void> _clearAllOrders(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final ordersRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('orders');
+
+    final confirmation = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Clear All Orders'),
+        content: Text(
+            'Are you sure you want to delete all your orders? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          ElevatedButton(
+            child: Text('Delete'),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmation != true) return;
+
+    final snapshot = await ordersRef.get();
+
+    final batch = FirebaseFirestore.instance.batch();
+
+    for (var doc in snapshot.docs) {
+      batch.delete(doc.reference);
+    }
+
+    await batch.commit();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('All orders have been deleted.')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -24,7 +70,16 @@ class OrdersScreen extends StatelessWidget {
         .orderBy('purchasedAt', descending: true);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Orders')),
+      appBar: AppBar(
+        title: const Text('My Orders'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete_forever),
+            tooltip: 'Clear All Orders',
+            onPressed: () => _clearAllOrders(context),
+          ),
+        ],
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: ordersRef.snapshots(),
         builder: (context, snapshot) {
@@ -43,7 +98,6 @@ class OrdersScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final order = orders[index].data() as Map<String, dynamic>;
 
-              // Try nested 'product' map first, fallback to root
               final productInfo = order['product'] as Map<String, dynamic>? ?? order;
               final itemName = productInfo['name'] ?? productInfo['title'] ?? 'Unnamed Product';
 
@@ -63,30 +117,53 @@ class OrdersScreen extends StatelessWidget {
                   ? DateFormat('yyyy-MM-dd – HH:mm').format(purchasedAtDate)
                   : 'Unknown Date';
 
-              // Handle images - try nested first
+              // Image extraction logic with fallback for multiple or single images
               List<String> imageList = [];
-              final imagesData = productInfo['image'] ?? order['image'];
+              final imagesData = productInfo['images'] ??
+                  order['images'] ??
+                  productInfo['image'] ??
+                  order['image'];
 
-              if (imagesData is List) {
-                imageList = imagesData.cast<String>();
-              } else if (imagesData is String) {
-                imageList = [imagesData];
+              if (imagesData != null) {
+                if (imagesData is List) {
+                  imageList = imagesData.cast<String>();
+                } else if (imagesData is String) {
+                  imageList = [imagesData];
+                }
               }
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(8),
-                  leading: imageList.isNotEmpty
-                      ? Image.memory(
-                          base64Decode(imageList[0]),
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.broken_image),
-                        )
-                      : const Icon(Icons.image_not_supported, size: 60),
+                  leading: SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: imageList.isNotEmpty
+                        ? ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: imageList.length,
+                            itemBuilder: (context, i) {
+                              try {
+                                final imageBytes = base64Decode(imageList[i]);
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 4),
+                                  child: Image.memory(
+                                    imageBytes,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        const Icon(Icons.broken_image),
+                                  ),
+                                );
+                              } catch (e) {
+                                return const Icon(Icons.broken_image, size: 60);
+                              }
+                            },
+                          )
+                        : const Icon(Icons.image_not_supported, size: 60),
+                  ),
                   title: Text(itemName),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,7 +175,6 @@ class OrdersScreen extends StatelessWidget {
                     ],
                   ),
                   onTap: () {
-                    // Navigate to ProductDetailScreen, pass full image list and details
                     Navigator.push(
                       context,
                       MaterialPageRoute(

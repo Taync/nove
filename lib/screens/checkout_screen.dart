@@ -20,7 +20,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isGift = false;
 
   bool get _isFormValid {
-    // Check if all required fields are filled
     return _nameController.text.isNotEmpty &&
         _cardNumberController.text.isNotEmpty &&
         _expiryDateController.text.isNotEmpty &&
@@ -36,49 +35,57 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     super.dispose();
   }
 
- Future<void> _clearCartAndNavigate() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-    final cartRef = userRef.collection('cart');
-    final ordersRef = userRef.collection('orders');
+  Future<void> _clearCartAndNavigate() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final cartRef = userRef.collection('cart');
+      final ordersRef = userRef.collection('orders');
 
-    final cartSnapshot = await cartRef.get();
+      final cartSnapshot = await cartRef.get();
 
-    if (cartSnapshot.docs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Your cart is empty.')),
+      if (cartSnapshot.docs.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Your cart is empty.')),
+        );
+        return;
+      }
+
+      final timestamp = DateTime.now();
+
+      for (var doc in cartSnapshot.docs) {
+        final itemData = doc.data();
+
+        // Normalize images to a list of strings
+        List<String> images = [];
+        if (itemData['images'] != null && itemData['images'] is List) {
+          images = List<String>.from(itemData['images']);
+        } else if (itemData['image'] != null && itemData['image'] is String) {
+          images = [itemData['image']];
+        }
+
+        await ordersRef.add({
+          ...itemData,
+          'images': images,
+          'purchasedAt': timestamp,
+          'isGift': _isGift,
+          'buyerName': _nameController.text,
+        });
+
+        await doc.reference.delete();
+      }
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => HomeScreen()),
+        (route) => false,
       );
-      return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('The products have been successfully added to your orders.')),
+      );
     }
-
-    final timestamp = DateTime.now();
-
-    // Add each cart item to the orders collection with timestamp
-    for (var doc in cartSnapshot.docs) {
-      final itemData = doc.data(); // this includes imageBase64
-      await ordersRef.add({
-        ...itemData,
-        'purchasedAt': timestamp,
-        'isGift': _isGift,
-        'buyerName': _nameController.text,
-      });
-            // Delete the item from the cart
-      await doc.reference.delete();
-    }
-
-    // Navigate to HomeScreen after clearing cart
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => HomeScreen()),
-      (route) => false,
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('The products have been successfully added to your orders.')),
-    );
   }
-}
 
   Future<void> _selectExpiryDate(BuildContext context) async {
     final DateTime? selectedDate = await showDatePicker(
@@ -100,7 +107,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text("Checkout")),
-      body: SingleChildScrollView( // This enables scrolling if content overflows
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -142,7 +149,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
               // Expiry Date Field with Date Picker
               GestureDetector(
-                onTap: () => _selectExpiryDate(context), // Trigger date picker
+                onTap: () => _selectExpiryDate(context),
                 child: AbsorbPointer(
                   child: TextField(
                     controller: _expiryDateController,
@@ -166,7 +173,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               TextField(
                 controller: _cvvController,
                 keyboardType: TextInputType.number,
-                maxLength: 3, // Limiting to 3 digits for CVV
+                maxLength: 3,
                 decoration: InputDecoration(
                   hintText: 'Enter CVV',
                   filled: true,
@@ -197,7 +204,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
               SizedBox(height: 32),
 
-              // Buy Button (Disabled if form is invalid)
+              // Buy Button
               SizedBox(
                 width: double.infinity,
                 height: 48,

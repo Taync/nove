@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:nove_5/firebase_options.dart';
+import 'package:flutter/material.dart';
 import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/account_screen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
@@ -10,65 +10,7 @@ import 'package:nove_5/screens/category_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/product_detail_screen.dart';
 import 'package:nove_5/screens/theme_provider.dart';
-import 'package:nove_5/splash_screen.dart';
-import 'dart:async';
-import 'package:nove_5/screens/ordersscreen.dart';
 import 'package:provider/provider.dart';
-
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white, // ← tüm Scaffold'lara etki eder
-      ),
-      home: SplashScreen(),
-    );
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 40),
-        child: Center(
-          child: Image.asset(
-            "Assets/novesplash.jpg",
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -80,12 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context); // Get the current theme
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        elevation: 0, // Keeps it flat; remove if you want a shadow
+        elevation: 0,
         centerTitle: true,
         title: Text(
           'NOVE',
@@ -105,9 +47,12 @@ class _HomeScreenState extends State<HomeScreen> {
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'Search For Brand,Category',
-                  prefixIcon: Icon(Icons.search, color: themeProvider.isDarkMode ? Colors.white : Colors.grey),
+                  prefixIcon: Icon(Icons.search,
+                      color:
+                          themeProvider.isDarkMode ? Colors.white : Colors.grey),
                   filled: true,
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -115,13 +60,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _searchQuery = value.toLowerCase(); // Case-insensitive search
+                    _searchQuery = value.toLowerCase();
                   });
                 },
               ),
             ),
             SizedBox(height: 10),
-            BannerCarousel(),
+            BannerCarousel(), // Firestore-driven banner carousel
             SizedBox(height: 20),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -133,11 +78,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                        color:
+                            themeProvider.isDarkMode ? Colors.white : Colors.black,
                       ),
                     ),
                   ),
-                  Divider(color: themeProvider.isDarkMode ? Colors.white : Colors.black, thickness: 2),
+                  Divider(
+                    color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                    thickness: 2,
+                  ),
                 ],
               ),
             ),
@@ -171,10 +120,11 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
         },
-        backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white, // Bottom nav bar color
+        backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
         selectedItemColor: themeProvider.isDarkMode ? Colors.white : Colors.black,
-        unselectedItemColor: themeProvider.isDarkMode ? Colors.grey : Colors.black54,
-        items: [
+        unselectedItemColor:
+            themeProvider.isDarkMode ? Colors.grey : Colors.black54,
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             label: 'Home',
@@ -201,7 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-
 class BannerCarousel extends StatefulWidget {
   @override
   _BannerCarouselState createState() => _BannerCarouselState();
@@ -211,32 +160,44 @@ class _BannerCarouselState extends State<BannerCarousel> {
   int _currentIndex = 0;
   Timer? _timer;
   late PageController _pageController;
-
-  final List<Map<String, String>> banners = [
-    {"image": "Assets/nike2.jpg", "category": "Nike"},
-    {"image": "Assets/dior.jpg", "category": "Dior"},
-    {"image": "Assets/prada2.jpg", "category": "Prada"},
-    {"image": "Assets/burberry.jpg", "category": "burberry"},
-    {"image": "Assets/sl2.jpg", "category": "YvesSaintLaurent"},
-    {"image": "Assets/moc.jpg", "category": "Moncler"},
-  ];
+  List<Map<String, String>> banners = [];
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
-    _timer = Timer.periodic(Duration(seconds: 7), (Timer timer) {
-      if (_currentIndex < banners.length - 1) {
-        _currentIndex++;
-      } else {
-        _currentIndex = 0;
+    fetchBanners();
+  }
+
+  Future<void> fetchBanners() async {
+    final querySnapshot =
+        await FirebaseFirestore.instance.collection('BannerImages').get();
+
+    final loadedBanners = querySnapshot.docs.map((doc) {
+      final data = doc.data();
+      return {
+        'BannerImage': data['BannerImage'] as String? ?? '',
+        'brand': data['brand'] as String? ?? '',
+      };
+    }).toList();
+
+    if (mounted) {
+      setState(() {
+        banners = loadedBanners;
+      });
+
+      if (banners.isNotEmpty) {
+        _timer?.cancel();
+        _timer = Timer.periodic(Duration(seconds: 7), (timer) {
+          _currentIndex = (_currentIndex + 1) % banners.length;
+          _pageController.animateToPage(
+            _currentIndex,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        });
       }
-      _pageController.animateToPage(
-        _currentIndex,
-        duration: Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    });
+    }
   }
 
   @override
@@ -248,6 +209,13 @@ class _BannerCarouselState extends State<BannerCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    if (banners.isEmpty) {
+      return SizedBox(
+        height: 380,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Column(
       children: [
         SizedBox(
@@ -261,23 +229,44 @@ class _BannerCarouselState extends State<BannerCarousel> {
               });
             },
             itemBuilder: (context, index) {
+              final banner = banners[index];
+              final imageBase64 = banner['BannerImage']!;
+              final brand = banner['brand']!;
+
+              Uint8List? imageBytes;
+              try {
+                imageBytes = base64Decode(imageBase64);
+              } catch (_) {
+                imageBytes = null;
+              }
+
               return GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder:
-                          (context) => CategoryScreen(
-                            categoryName: banners[index]["category"]!,
-                          ),
-                    ),
-                  );
+                  if (brand.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CategoryScreen(brandName: brand),
+                      ),
+                    );
+                  }
                 },
-                child: Image.asset(
-                  banners[index]["image"]!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
+                child: imageBytes != null
+                    ? Image.memory(
+                        imageBytes,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      )
+                    : Container(
+                        color: Colors.grey[300],
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                      ),
               );
             },
           ),
@@ -293,10 +282,9 @@ class _BannerCarouselState extends State<BannerCarousel> {
               height: 8,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color:
-                    _currentIndex == index
-                        ? Colors.black
-                        : const Color.fromARGB(255, 178, 178, 178),
+                color: _currentIndex == index
+                    ? Colors.black
+                    : Color.fromARGB(255, 178, 178, 178),
               ),
             ),
           ),
@@ -307,8 +295,9 @@ class _BannerCarouselState extends State<BannerCarousel> {
 }
 
 class ProductHorizontalList extends StatelessWidget {
-   final String searchQuery;
-   ProductHorizontalList({required this.searchQuery});
+  final String searchQuery;
+  ProductHorizontalList({required this.searchQuery});
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -331,9 +320,14 @@ class ProductHorizontalList extends StatelessWidget {
             final brand = product['brand']?.toString().toLowerCase() ?? '';
             final category = product['category']?.toString().toLowerCase() ?? '';
             return name.contains(searchQuery) ||
-                  brand.contains(searchQuery) ||
-                  category.contains(searchQuery);
+                brand.contains(searchQuery) ||
+                category.contains(searchQuery);
           }).toList();
+
+          if (filteredProducts.isEmpty) {
+            return Center(child: Text("No products found for \"$searchQuery\"."));
+          }
+
           return ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: filteredProducts.length,
@@ -350,26 +344,25 @@ class ProductHorizontalList extends StatelessWidget {
                 imageList = [imagesData];
               }
               final description = product['description'] ?? '';
-              final brand = product['brand'];
-              final category = product['category'];
-              final gender = product['gender'];
+              final brand = product['brand'] ?? '';
+              final category = product['category'] ?? '';
+              final gender = product['gender'] ?? '';
 
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (context) => ProductDetailScreen(
-                            images: imageList,
-                            productName: name,
-                            price: price,
-                            description: description,
-                            category: category,
-                            brand: brand,
-                            gender: gender,
-                            color: '',
-                          ),
+                      builder: (context) => ProductDetailScreen(
+                        images: imageList,
+                        productName: name,
+                        price: price,
+                        description: description,
+                        category: category,
+                        brand: brand,
+                        gender: gender,
+                        color: '',
+                      ),
                     ),
                   );
                 },
@@ -378,9 +371,7 @@ class ProductHorizontalList extends StatelessWidget {
                   margin: EdgeInsets.symmetric(horizontal: 8),
                   child: Card(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        0,
-                      ), // No rounded corners
+                      borderRadius: BorderRadius.circular(0), // no rounding
                     ),
                     color: Theme.of(context).cardColor,
                     elevation: 2,
@@ -388,26 +379,23 @@ class ProductHorizontalList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child:
-                              imageList.isNotEmpty
-                                  ? Image.memory(
-                                    base64Decode(imageList[0]),
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Center(
-                                        child: Icon(Icons.broken_image),
-                                      );
-                                    },
-                                  )
-                                  : Center(child: Icon(Icons.broken_image)),
+                          child: imageList.isNotEmpty
+                              ? Image.memory(
+                                  base64Decode(imageList[0]),
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Center(child: Icon(Icons.broken_image));
+                                  },
+                                )
+                              : Center(child: Icon(Icons.broken_image)),
                         ),
                         Padding(
                           padding: EdgeInsets.all(8),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (brand != null)
+                              if (brand.isNotEmpty)
                                 Text(
                                   brand,
                                   style: TextStyle(fontWeight: FontWeight.bold),
