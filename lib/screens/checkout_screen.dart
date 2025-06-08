@@ -17,13 +17,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _cardNumberController = TextEditingController();
   final TextEditingController _expiryDateController = TextEditingController();
   final TextEditingController _cvvController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+
   bool _isGift = false;
 
   bool get _isFormValid {
-    return _nameController.text.isNotEmpty &&
-        _cardNumberController.text.isNotEmpty &&
-        _expiryDateController.text.isNotEmpty &&
-        _cvvController.text.isNotEmpty;
+    return _nameController.text.trim().isNotEmpty &&
+        _cardNumberController.text.trim().isNotEmpty &&
+        _expiryDateController.text.trim().isNotEmpty &&
+        _cvvController.text.trim().isNotEmpty &&
+        _addressController.text.trim().isNotEmpty;
+    // Note: _isGift is NOT part of validation, so checked or not — it won't block BUY
   }
 
   @override
@@ -32,6 +36,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _cardNumberController.dispose();
     _expiryDateController.dispose();
     _cvvController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 
@@ -56,7 +61,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       for (var doc in cartSnapshot.docs) {
         final itemData = doc.data();
 
-        // Normalize images to a list of strings
         List<String> images = [];
         if (itemData['images'] != null && itemData['images'] is List) {
           images = List<String>.from(itemData['images']);
@@ -69,7 +73,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           'images': images,
           'purchasedAt': timestamp,
           'isGift': _isGift,
-          'buyerName': _nameController.text,
+          'buyerName': _nameController.text.trim(),
+          'shippingAddress': _addressController.text.trim(),
         });
 
         await doc.reference.delete();
@@ -118,14 +123,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Your Name',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode
-                      ? Colors.grey[800]
-                      : Colors.grey[300],
+                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
                 ),
+                onChanged: (_) => setState(() {}),
+              ),
+              SizedBox(height: 16),
+
+              // Address Field
+              TextField(
+                controller: _addressController,
+                decoration: InputDecoration(
+                  hintText: 'Enter Your Address',
+                  filled: true,
+                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                onChanged: (_) => setState(() {}),
               ),
               SizedBox(height: 16),
 
@@ -136,14 +156,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Card Number',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode
-                      ? Colors.grey[800]
-                      : Colors.grey[300],
+                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
                 ),
+                onChanged: (_) => setState(() {}),
               ),
               SizedBox(height: 16),
 
@@ -156,9 +175,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     decoration: InputDecoration(
                       hintText: 'MM/YY Expiry Date',
                       filled: true,
-                      fillColor: themeProvider.isDarkMode
-                          ? Colors.grey[800]
-                          : Colors.grey[300],
+                      fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -177,41 +194,38 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter CVV',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode
-                      ? Colors.grey[800]
-                      : Colors.grey[300],
+                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
                 ),
+                onChanged: (_) => setState(() {}),
               ),
               SizedBox(height: 16),
 
-              // Gift Checkbox
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isGift,
-                    onChanged: (val) {
-                      setState(() {
-                        _isGift = val ?? false;
-                      });
-                    },
-                  ),
-                  Text('I want a gift package'),
-                ],
+              // Gift Package Checkbox (optional)
+              CheckboxListTile(
+                title: Text("Add gift packaging (optional)"),
+                value: _isGift,
+                onChanged: (val) {
+                  setState(() {
+                    _isGift = val ?? false;
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
               ),
               SizedBox(height: 32),
 
-              // Buy Button
+              // Buy Button — enabled if form valid (gift optional)
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
                   onPressed: _isFormValid ? _clearCartAndNavigate : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: _isFormValid ? Colors.black : Colors.grey,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

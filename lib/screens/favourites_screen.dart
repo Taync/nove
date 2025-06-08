@@ -62,6 +62,7 @@ class FavouritesScreen extends StatelessWidget {
                               category: data['category'] ?? '-',
                               gender: data['gender'] ?? '-',
                               color: data['color'] ?? '-',
+                              stock: data['stock'] ?? 0,  // <-- Added stock here
                             ),
                           ),
                         );

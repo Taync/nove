@@ -69,6 +69,22 @@ class OrdersScreen extends StatelessWidget {
         .collection('orders')
         .orderBy('purchasedAt', descending: true);
 
+    Widget buildBase64Image(String base64String) {
+      try {
+        final decodedBytes = base64Decode(base64String);
+        return Image.memory(
+          decodedBytes,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.broken_image, size: 60),
+        );
+      } catch (e) {
+        return const Icon(Icons.broken_image, size: 60);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Orders'),
@@ -117,12 +133,8 @@ class OrdersScreen extends StatelessWidget {
                   ? DateFormat('yyyy-MM-dd – HH:mm').format(purchasedAtDate)
                   : 'Unknown Date';
 
-              // Image extraction logic with fallback for multiple or single images
               List<String> imageList = [];
-              final imagesData = productInfo['images'] ??
-                  order['images'] ??
-                  productInfo['image'] ??
-                  order['image'];
+              final imagesData = productInfo['imageBase64'] ?? order['imageBase64'];
 
               if (imagesData != null) {
                 if (imagesData is List) {
@@ -131,6 +143,12 @@ class OrdersScreen extends StatelessWidget {
                   imageList = [imagesData];
                 }
               }
+
+              // Get stock from productInfo or default to 0 if missing
+              final rawStock = productInfo['stock'] ?? order['stock'] ?? 0;
+              final stock = rawStock is int
+                  ? rawStock
+                  : int.tryParse(rawStock.toString()) ?? 0;
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -144,22 +162,10 @@ class OrdersScreen extends StatelessWidget {
                             scrollDirection: Axis.horizontal,
                             itemCount: imageList.length,
                             itemBuilder: (context, i) {
-                              try {
-                                final imageBytes = base64Decode(imageList[i]);
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 4),
-                                  child: Image.memory(
-                                    imageBytes,
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        const Icon(Icons.broken_image),
-                                  ),
-                                );
-                              } catch (e) {
-                                return const Icon(Icons.broken_image, size: 60);
-                              }
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: buildBase64Image(imageList[i]),
+                              );
                             },
                           )
                         : const Icon(Icons.image_not_supported, size: 60),
@@ -187,6 +193,7 @@ class OrdersScreen extends StatelessWidget {
                           category: productInfo['category'] ?? '',
                           gender: productInfo['gender'] ?? '',
                           color: productInfo['color'] ?? '',
+                          stock: stock, // Pass stock here
                         ),
                       ),
                     );

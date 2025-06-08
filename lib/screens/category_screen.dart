@@ -125,6 +125,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               final brand = product['brand'] ?? '';
               final gender = product['gender'] ?? '';
               final color = product['color'] ?? 'Green';
+              final stock = product['stock'] ?? '';
 
               return GestureDetector(
                 onTap: () {
@@ -140,6 +141,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         brand: brand,
                         gender: gender,
                         color: color,
+                        stock: stock,
                       ),
                     ),
                   );
