@@ -14,8 +14,7 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
-  List<File>?
-  files; // Changed from File? to List<File> to handle multiple images
+  List<File>? files; // Changed from File? to List<File> to handle multiple images
   String? value; // category
   String? selectedBrand;
   String? selectedGender;
@@ -91,9 +90,14 @@ class _AddProductState extends State<AddProduct> {
   Future getImage() async {
     final ImagePicker picker = ImagePicker();
     final List<XFile> images = await picker.pickMultiImage();
+<<<<<<< HEAD
     if (images.isNotEmpty) {
       List<File> selectedFiles =
           images.map((image) => File(image.path)).toList();
+=======
+    if (images != null && images.isNotEmpty) {
+      List<File> selectedFiles = images.map((image) => File(image.path)).toList();
+>>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
       setState(() {
         files = selectedFiles;
       });
@@ -106,10 +110,20 @@ class _AddProductState extends State<AddProduct> {
         value != null &&
         selectedGender != null &&
         selectedBrand != null &&
-        selectedColor != null && // Check if a color is selected
+        selectedColor != null &&
         descriptionController.text.isNotEmpty &&
-        priceController.text.isNotEmpty) {
+        priceController.text.isNotEmpty &&
+        stockController.text.isNotEmpty // Check stock is filled
+    ) {
       String addId = randomAlphaNumeric(10);
+
+      int? stock = int.tryParse(stockController.text);
+      if (stock == null || stock < 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Please enter a valid stock number")),
+        );
+        return;
+      }
 
       try {
         List<String> base64Images = [];
@@ -128,43 +142,45 @@ class _AddProductState extends State<AddProduct> {
           'gender': selectedGender,
           'description': descriptionController.text,
           'price': double.tryParse(priceController.text) ?? 0.0,
-          'color': selectedColor, // Include the selected color
+          'color': selectedColor,
+          'stock': stock,
           'imageBase64': base64Images,
           'id': addId,
         });
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Product added successfully")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Product added successfully")),
+        );
 
         // Clear the form
         namecontroller.clear();
         priceController.clear();
         descriptionController.clear();
+        stockController.clear();
+
         setState(() {
           files = null;
           value = null;
           selectedGender = null;
           selectedBrand = null;
-          selectedColor = null; // Reset color selection
+          selectedColor = null;
           imageLinks = [];
         });
         imageLinkController.clear();
       } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Upload failed: $e")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Upload failed: $e")),
+        );
       }
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Please fill all fields")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill all fields")),
+      );
     }
   }
 
   void addStockToAllProducts() async {
-    final products =
-        await FirebaseFirestore.instance.collection('Product').get();
+    final products = await FirebaseFirestore.instance.collection('Product').get();
     for (var doc in products.docs) {
       final int stock = doc.data()['stock'] ?? 0;
       await doc.reference.update({'stock': stock});
@@ -198,6 +214,7 @@ class _AddProductState extends State<AddProduct> {
             if (files != null && files!.isNotEmpty)
               GridView.builder(
                 shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 10,
@@ -210,9 +227,7 @@ class _AddProductState extends State<AddProduct> {
                     width: 100,
                     height: 100,
                     fit: BoxFit.cover,
-                    errorBuilder:
-                        (context, error, stackTrace) =>
-                            Icon(Icons.broken_image),
+                    errorBuilder: (context, error, stackTrace) => Icon(Icons.broken_image),
                   );
                 },
               ),
@@ -264,10 +279,7 @@ class _AddProductState extends State<AddProduct> {
                       Text(
                         selectedColor ?? "Select Color",
                         style: TextStyle(
-                          color:
-                              selectedColor == null
-                                  ? Colors.grey
-                                  : Colors.black,
+                          color: selectedColor == null ? Colors.grey : Colors.black,
                           fontSize: 16,
                         ),
                       ),
@@ -279,41 +291,36 @@ class _AddProductState extends State<AddProduct> {
             else
               Wrap(
                 spacing: 10,
-                children:
-                    colorItem.map((color) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedColor = color;
-                            showColorPicker = false;
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color:
-                                  selectedColor == color
-                                      ? Colors.black
-                                      : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            backgroundColor: _getColorFromName(color),
-                            radius: 16,
-                            child:
-                                selectedColor == color
-                                    ? Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      size: 18,
-                                    )
-                                    : null,
-                          ),
+                children: colorItem.map((color) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedColor = color;
+                        showColorPicker = false;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: selectedColor == color ? Colors.black : Colors.transparent,
+                          width: 2,
                         ),
-                      );
-                    }).toList(),
+                      ),
+                      child: CircleAvatar(
+                        backgroundColor: _getColorFromName(color),
+                        radius: 16,
+                        child: selectedColor == color
+                            ? Icon(
+                                Icons.check,
+                                color: Colors.white,
+                                size: 18,
+                              )
+                            : null,
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             SizedBox(height: 20),
 
@@ -322,6 +329,14 @@ class _AddProductState extends State<AddProduct> {
               priceController,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               hint: "Enter product price",
+            ),
+            SizedBox(height: 20),
+
+            Text("Stock"),
+            buildInput(
+              stockController,
+              keyboardType: TextInputType.number,
+              hint: "Enter product stock",
             ),
             SizedBox(height: 20),
 
@@ -387,12 +402,11 @@ class _AddProductState extends State<AddProduct> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          items:
-              items
-                  .map(
-                    (item) => DropdownMenuItem(value: item, child: Text(item)),
-                  )
-                  .toList(),
+          items: items
+              .map(
+                (item) => DropdownMenuItem(value: item, child: Text(item)),
+              )
+              .toList(),
           onChanged: onChanged,
           dropdownColor: Colors.white,
           hint: Text("Select"),

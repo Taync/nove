@@ -1,5 +1,6 @@
 // Düzenlenmiş AdminPanelScreen.dart
 import 'package:flutter/material.dart';
+import 'package:nove_5/Admin/EditProducts.dart';
 import 'AddProduct.dart';
 import 'CategoryManagementScreen.dart';
 import 'BannerManagementScreen.dart';
@@ -8,20 +9,14 @@ import 'UserManagementScreen.dart';
 
 class AdminPanelScreen extends StatelessWidget {
   final List<_AdminPanelItem> items = [
-    _AdminPanelItem(Icons.add_box, "Add Product", AddProduct()),
-    _AdminPanelItem(
-      Icons.category,
-      "Category Management",
-      CategoryManagementScreen(),
-    ),
-    _AdminPanelItem(Icons.image, "Banner Management", BannerManagementScreen()),
-    _AdminPanelItem(
-      Icons.shopping_cart,
-      "Order Management",
-      OrderManagementScreen(),
-    ),
-    _AdminPanelItem(Icons.people, "User Management", UserManagementScreen()),
-  ];
+  _AdminPanelItem(Icons.add_box, "Add Product", AddProduct()),
+  _AdminPanelItem(Icons.edit, "Manage Products", EditProductsScreen()), // ← add this line
+  _AdminPanelItem(Icons.category, "Category Management", CategoryManagementScreen()),
+  _AdminPanelItem(Icons.image, "Banner Management", BannerManagementScreen()),
+  _AdminPanelItem(Icons.shopping_cart, "Order Management", OrderManagementScreen()),
+  _AdminPanelItem(Icons.people, "User Management", UserManagementScreen()),
+];
+
 
   @override
   Widget build(BuildContext context) {

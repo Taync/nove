@@ -3,36 +3,40 @@ import 'category_screen.dart';
 import 'SubSubCategoryScreen.dart';
 
 class SubCategoryScreen extends StatelessWidget {
-  final String gender; // "Erkek" veya "Kadın"
+  final String gender; // "Male", "Female", "Kids"
 
   SubCategoryScreen({required this.gender});
 
   final List<Map<String, dynamic>> categories = [
     {
       'title': 'All Clothing',
+<<<<<<< HEAD
       'image':
           'https://i.pinimg.com/736x/63/f2/7c/63f27ca8c998ed1f069af92c1e9888a0.jpg', // Replace with real URL
       'category': 'all',
     },
     {
       'title': 'New Arrivals',
+=======
+>>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
       'image': 'https://via.placeholder.com/100',
-      'category': 'new',
+      'type': 'all',
     },
     {
       'title': 'Clothing',
       'image': 'https://via.placeholder.com/100',
-      'category': 'Giyim',
+      'type': 'clothing',
     },
     {
       'title': 'Shoes',
       'image': 'https://via.placeholder.com/100',
-      'category': 'Ayakkabı',
+      'type': 'category',
+      'category': 'Shoes',
     },
     {
       'title': 'Accessories',
       'image': 'https://via.placeholder.com/100',
-      'category': 'Aksesuar',
+      'type': 'accessories',
     },
   ];
 
@@ -82,7 +86,29 @@ class SubCategoryScreen extends StatelessWidget {
     'Accessories',
     'Jewelry',
   ];
-  final List<String> aksesuarSubcategoriesKids = ['Watches', 'Accessories'];
+  final List<String> aksesuarSubcategoriesKids = [
+    'Watches',
+    'Accessories',
+  ];
+
+  List<String> getSubcategories(String type) {
+    final genderLower = gender.toLowerCase();
+    final isMale = genderLower.contains('male') || genderLower.contains('man');
+    final isFemale = genderLower.contains('female') || genderLower.contains('woman') || genderLower.contains('kadın') || genderLower.contains('kadin');
+    final isKids = genderLower.contains('kids') || genderLower.contains('çocuk');
+
+    if (type == 'clothing') {
+      if (isMale) return giyimSubcategoriesMale;
+      if (isFemale) return giyimSubcategoriesFemale;
+      return giyimSubcategoriesKids;
+    } else if (type == 'accessories') {
+      if (isMale) return aksesuarSubcategoriesMale;
+      if (isFemale) return aksesuarSubcategoriesFemale;
+      return aksesuarSubcategoriesKids;
+    }
+
+    return [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +119,7 @@ class SubCategoryScreen extends StatelessWidget {
         separatorBuilder: (context, index) => Divider(),
         itemBuilder: (context, index) {
           final item = categories[index];
+
           return ListTile(
             leading: CircleAvatar(
               backgroundImage: NetworkImage(item['image']),
@@ -100,57 +127,47 @@ class SubCategoryScreen extends StatelessWidget {
             ),
             title: Text(item['title']),
             trailing: Icon(Icons.chevron_right),
-            onTap: () async {
-              if (item['title'] == 'Clothing' ||
-                  item['title'] == 'Accessories') {
-                final genderLower = gender.toLowerCase();
-                final isMale =
-                    genderLower.contains('Man') || genderLower.contains('Men');
-                final isFemale =
-                    genderLower.contains('Women') ||
-                    genderLower.contains('kadın') ||
-                    genderLower.contains('kadin');
-                final isKids =
-                    genderLower.contains('Kids') ||
-                    genderLower.contains('çocuk');
-                List<String> subcategories;
-                if (item['title'] == 'Clothing') {
-                  if (isMale) {
-                    subcategories = giyimSubcategoriesMale;
-                  } else if (isFemale) {
-                    subcategories = giyimSubcategoriesFemale;
-                  } else if (isKids) {
-                    subcategories = giyimSubcategoriesKids;
-                  } else {
-                    subcategories = giyimSubcategoriesFemale;
-                  }
-                } else {
-                  if (isMale) {
-                    subcategories = aksesuarSubcategoriesMale;
-                  } else if (isFemale) {
-                    subcategories = aksesuarSubcategoriesFemale;
-                  } else if (isKids) {
-                    subcategories = aksesuarSubcategoriesKids;
-                  } else {
-                    subcategories = aksesuarSubcategoriesFemale;
-                  }
-                }
+            onTap: () {
+              final type = item['type'];
+
+              if (type == 'all') {
+                // All Clothing (show by gender)
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder:
-                        (_) => SubSubCategoryScreen(
-                          title: item['title'],
-                          subcategories: subcategories,
-                        ),
+                    builder: (_) => CategoryScreen(gender: gender),
                   ),
                 );
-              } else {
+              } else if (type == 'new') {
+                // New Arrivals
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder:
-                        (_) => CategoryScreen(categoryName: item['category']),
+                    builder: (_) => CategoryScreen(showNewArrivals: true),
+                  ),
+                );
+              } else if (type == 'clothing' || type == 'accessories') {
+                // Navigate to sub-subcategory screen with gender passed
+                final subcategories = getSubcategories(type);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SubSubCategoryScreen(
+                      title: item['title'],
+                      subcategories: subcategories,
+                      gender: gender,  // Pass gender here
+                    ),
+                  ),
+                );
+              } else if (type == 'category') {
+                // Navigate to specific category directly with gender
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CategoryScreen(
+                      categoryName: item['category'],
+                      gender: gender, // Pass gender here
+                    ),
                   ),
                 );
               }
