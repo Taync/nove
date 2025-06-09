@@ -168,37 +168,38 @@ class _BannerCarouselState extends State<BannerCarousel> {
     _pageController = PageController(initialPage: _currentIndex);
     fetchBanners();
   }
+Future<void> fetchBanners() async {
+  final querySnapshot = await FirebaseFirestore.instance
+      .collection('BannerImages')
+      .where('isActive', isEqualTo: true)  // <-- Add this filter
+      .get();
 
-  Future<void> fetchBanners() async {
-    final querySnapshot =
-        await FirebaseFirestore.instance.collection('BannerImages').get();
+  final loadedBanners = querySnapshot.docs.map((doc) {
+    final data = doc.data();
+    return {
+      'BannerImage': data['BannerImage'] as String? ?? '',
+      'brand': data['brand'] as String? ?? '',
+    };
+  }).toList();
 
-    final loadedBanners = querySnapshot.docs.map((doc) {
-      final data = doc.data();
-      return {
-        'BannerImage': data['BannerImage'] as String? ?? '',
-        'brand': data['brand'] as String? ?? '',
-      };
-    }).toList();
+  if (mounted) {
+    setState(() {
+      banners = loadedBanners;
+    });
 
-    if (mounted) {
-      setState(() {
-        banners = loadedBanners;
+    if (banners.isNotEmpty) {
+      _timer?.cancel();
+      _timer = Timer.periodic(Duration(seconds: 7), (timer) {
+        _currentIndex = (_currentIndex + 1) % banners.length;
+        _pageController.animateToPage(
+          _currentIndex,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
       });
-
-      if (banners.isNotEmpty) {
-        _timer?.cancel();
-        _timer = Timer.periodic(Duration(seconds: 7), (timer) {
-          _currentIndex = (_currentIndex + 1) % banners.length;
-          _pageController.animateToPage(
-            _currentIndex,
-            duration: Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        });
-      }
     }
   }
+}  
 
   @override
   void dispose() {

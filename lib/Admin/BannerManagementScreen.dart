@@ -3,18 +3,18 @@ import 'package:nove_5/Admin/AddBannerCoursel.dart';
 import 'package:nove_5/Admin/ViewBannerCourselImages.dart';
 
 class BannerManagementScreen extends StatelessWidget {
-   BannerManagementScreen({super.key});
+  BannerManagementScreen({super.key});
 
-  final List<_BannerOption> options = [
-    _BannerOption(
+  final List<BannerOption> options = [
+    BannerOption(
       icon: Icons.add_photo_alternate,
       title: "Add Banner Images",
       screen: AddBannerCarouselImage(),
     ),
-    const _BannerOption(
+    BannerOption(
       icon: Icons.view_carousel,
-      title: "View / Delete Banner Images",
-      screen: ViewBannerCarouselImages(),
+      title: "View / Delete / Edit Banner Images",
+      screen: ViewBannerCarousel(), // ✅ Correct usage
     ),
   ];
 
@@ -48,12 +48,13 @@ class BannerManagementScreen extends StatelessWidget {
   }
 }
 
-class _BannerOption {
+// Made this class public for clarity and possible reuse
+class BannerOption {
   final IconData icon;
   final String title;
   final Widget screen;
 
-  const _BannerOption({
+  const BannerOption({
     required this.icon,
     required this.title,
     required this.screen,

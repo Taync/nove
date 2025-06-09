@@ -14,11 +14,6 @@ class SubCategoryScreen extends StatelessWidget {
       'type': 'all',
     },
     {
-      'title': 'New Arrivals',
-      'image': 'https://via.placeholder.com/100',
-      'type': 'new',
-    },
-    {
       'title': 'Clothing',
       'image': 'https://via.placeholder.com/100',
       'type': 'clothing',
@@ -143,7 +138,7 @@ class SubCategoryScreen extends StatelessWidget {
                   ),
                 );
               } else if (type == 'clothing' || type == 'accessories') {
-                // Navigate to sub-subcategory screen
+                // Navigate to sub-subcategory screen with gender passed
                 final subcategories = getSubcategories(type);
                 Navigator.push(
                   context,
@@ -151,16 +146,18 @@ class SubCategoryScreen extends StatelessWidget {
                     builder: (_) => SubSubCategoryScreen(
                       title: item['title'],
                       subcategories: subcategories,
+                      gender: gender,  // Pass gender here
                     ),
                   ),
                 );
               } else if (type == 'category') {
-                // Navigate to specific category directly
+                // Navigate to specific category directly with gender
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => CategoryScreen(
                       categoryName: item['category'],
+                      gender: gender, // Pass gender here
                     ),
                   ),
                 );
