@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: 'Search For Brand,Categor',
+                  hintText: 'Search For Brand,Category',
                   prefixIcon: Icon(Icons.search,
                       color:
                           themeProvider.isDarkMode ? Colors.white : Colors.grey),
