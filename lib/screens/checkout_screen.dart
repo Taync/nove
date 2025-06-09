@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +59,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       // Optional: show a message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('There was an error, all of the products were removed from your cart!')),
+        SnackBar(
+          content: Text(
+            'There was an error, all of the products were removed from your cart!',
+          ),
+        ),
       );
     }
   }
@@ -85,7 +88,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text("Checkout")),
-      body: SingleChildScrollView( // This enables scrolling if content overflows
+      body: SingleChildScrollView(
+        // This enables scrolling if content overflows
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -96,9 +100,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Your Name',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode
-                      ? Colors.grey[800]
-                      : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -114,9 +119,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Card Number',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode
-                      ? Colors.grey[800]
-                      : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -134,9 +140,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     decoration: InputDecoration(
                       hintText: 'MM/YY Expiry Date',
                       filled: true,
-                      fillColor: themeProvider.isDarkMode
-                          ? Colors.grey[800]
-                          : Colors.grey[300],
+                      fillColor:
+                          themeProvider.isDarkMode
+                              ? Colors.grey[800]
+                              : Colors.grey[300],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -155,9 +162,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter CVV',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode
-                      ? Colors.grey[800]
-                      : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,

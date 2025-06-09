@@ -10,7 +10,8 @@ class SubCategoryScreen extends StatelessWidget {
   final List<Map<String, dynamic>> categories = [
     {
       'title': 'All Clothing',
-      'image': 'https://via.placeholder.com/100', // Replace with real URL
+      'image':
+          'https://i.pinimg.com/736x/63/f2/7c/63f27ca8c998ed1f069af92c1e9888a0.jpg', // Replace with real URL
       'category': 'all',
     },
     {

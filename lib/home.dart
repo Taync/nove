@@ -80,7 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context); // Get the current theme
+    final themeProvider = Provider.of<ThemeProvider>(
+      context,
+    ); // Get the current theme
 
     return Scaffold(
       appBar: AppBar(
@@ -105,9 +107,16 @@ class _HomeScreenState extends State<HomeScreen> {
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'Search For Brand,Category',
-                  prefixIcon: Icon(Icons.search, color: themeProvider.isDarkMode ? Colors.white : Colors.grey),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color:
+                        themeProvider.isDarkMode ? Colors.white : Colors.grey,
+                  ),
                   filled: true,
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -115,7 +124,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _searchQuery = value.toLowerCase(); // Case-insensitive search
+                    _searchQuery =
+                        value.toLowerCase(); // Case-insensitive search
                   });
                 },
               ),
@@ -133,11 +143,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                        color:
+                            themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
                       ),
                     ),
                   ),
-                  Divider(color: themeProvider.isDarkMode ? Colors.white : Colors.black, thickness: 2),
+                  Divider(
+                    color:
+                        themeProvider.isDarkMode ? Colors.white : Colors.black,
+                    thickness: 2,
+                  ),
                 ],
               ),
             ),
@@ -171,9 +188,14 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
         },
-        backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white, // Bottom nav bar color
-        selectedItemColor: themeProvider.isDarkMode ? Colors.white : Colors.black,
-        unselectedItemColor: themeProvider.isDarkMode ? Colors.grey : Colors.black54,
+        backgroundColor:
+            themeProvider.isDarkMode
+                ? Colors.black
+                : Colors.white, // Bottom nav bar color
+        selectedItemColor:
+            themeProvider.isDarkMode ? Colors.white : Colors.black,
+        unselectedItemColor:
+            themeProvider.isDarkMode ? Colors.grey : Colors.black54,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
@@ -200,7 +222,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
 
 class BannerCarousel extends StatefulWidget {
   @override
@@ -307,8 +328,8 @@ class _BannerCarouselState extends State<BannerCarousel> {
 }
 
 class ProductHorizontalList extends StatelessWidget {
-   final String searchQuery;
-   ProductHorizontalList({required this.searchQuery});
+  final String searchQuery;
+  ProductHorizontalList({required this.searchQuery});
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -326,14 +347,16 @@ class ProductHorizontalList extends StatelessWidget {
 
           final allProducts = snapshot.data!.docs;
 
-          final filteredProducts = allProducts.where((product) {
-            final name = product['name']?.toString().toLowerCase() ?? '';
-            final brand = product['brand']?.toString().toLowerCase() ?? '';
-            final category = product['category']?.toString().toLowerCase() ?? '';
-            return name.contains(searchQuery) ||
-                  brand.contains(searchQuery) ||
-                  category.contains(searchQuery);
-          }).toList();
+          final filteredProducts =
+              allProducts.where((product) {
+                final name = product['name']?.toString().toLowerCase() ?? '';
+                final brand = product['brand']?.toString().toLowerCase() ?? '';
+                final category =
+                    product['category']?.toString().toLowerCase() ?? '';
+                return name.contains(searchQuery) ||
+                    brand.contains(searchQuery) ||
+                    category.contains(searchQuery);
+              }).toList();
           return ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: filteredProducts.length,
@@ -420,7 +443,7 @@ class ProductHorizontalList extends StatelessWidget {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                "\₺$price",
+                                "₺$price",
                                 style: TextStyle(
                                   color: Colors.green,
                                   fontWeight: FontWeight.bold,

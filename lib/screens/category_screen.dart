@@ -4,8 +4,10 @@ import 'product_detail_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String categoryName;
+  final String? gender;
+  final String? mainCategory;
 
-  CategoryScreen({required this.categoryName});
+  CategoryScreen({required this.categoryName, this.gender, this.mainCategory});
 
   @override
   _CategoryScreenState createState() => _CategoryScreenState();
@@ -16,6 +18,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Query query = FirebaseFirestore.instance.collection('Product');
+
+    query = query.where('category', isEqualTo: widget.categoryName);
+
+    if (widget.gender != null) {
+      query = query.where('gender', isEqualTo: widget.gender);
+    }
+
+    if (widget.mainCategory != null) {
+      query = query.where('mainCategory', isEqualTo: widget.mainCategory);
+    }
+
+    query = query.orderBy('price', descending: _sortOrder == 'desc');
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.categoryName),
@@ -29,7 +45,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
             },
             itemBuilder:
                 (context) => [
-                  PopupMenuItem(value: 'asc', child: Text('Sort by Price: Low to High')),
+                  PopupMenuItem(
+                    value: 'asc',
+                    child: Text('Sort by Price: Low to High'),
+                  ),
                   PopupMenuItem(
                     value: 'desc',
                     child: Text('Sort by Price: High to Low'),
@@ -39,12 +58,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance
-                .collection('Product')
-                .where('category', isEqualTo: widget.categoryName)
-                .orderBy('price', descending: _sortOrder == 'desc')
-                .snapshots(),
+        stream: query.snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -69,12 +83,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
               final product = products[index];
               final name = product['name'] ?? 'Ürün';
               final price = product['price']?.toString() ?? '0';
-              final imageUrls = product['imageUrls'] ?? [];
+              final imageUrls = product['imageBase64'] ?? [];
               final description = product['description'] ?? '';
               final category = product['category'] ?? '';
               final brand = product['brand'] ?? '';
               final gender = product['gender'] ?? '';
-              final color = product['color'] ?? 'Green';
+              final color = product['color'] ?? '';
 
               return GestureDetector(
                 onTap: () {

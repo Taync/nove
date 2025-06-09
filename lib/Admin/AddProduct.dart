@@ -46,7 +46,7 @@ class _AddProductState extends State<AddProduct> {
     'Accessories',
   ];
 
-  final List<String> genderItem = ['Male', 'Female', 'Kids'];
+  final List<String> genderItem = ['Man', 'Women', 'Kids'];
   final List<String> brandItem = [
     'Nike',
     'Adidas',
@@ -63,6 +63,7 @@ class _AddProductState extends State<AddProduct> {
     'Network',
     'Vakko',
     'Dior',
+    'Ralph Lauren',
   ];
 
   final List<String> colorItem = [
@@ -90,7 +91,7 @@ class _AddProductState extends State<AddProduct> {
   Future getImage() async {
     final ImagePicker picker = ImagePicker();
     final List<XFile> images = await picker.pickMultiImage();
-    if (images != null && images.isNotEmpty) {
+    if (images.isNotEmpty) {
       List<File> selectedFiles =
           images.map((image) => File(image.path)).toList();
       setState(() {
