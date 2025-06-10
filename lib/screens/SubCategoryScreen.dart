@@ -10,32 +10,27 @@ class SubCategoryScreen extends StatelessWidget {
   final List<Map<String, dynamic>> categories = [
     {
       'title': 'All Clothing',
-<<<<<<< HEAD
       'image':
-          'https://i.pinimg.com/736x/63/f2/7c/63f27ca8c998ed1f069af92c1e9888a0.jpg', // Replace with real URL
-      'category': 'all',
-    },
-    {
-      'title': 'New Arrivals',
-=======
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
-      'image': 'https://via.placeholder.com/100',
+          'https://i.pinimg.com/736x/8f/c9/50/8fc9506cee505a5baacf01c964aefe36.jpg',
       'type': 'all',
     },
     {
       'title': 'Clothing',
-      'image': 'https://via.placeholder.com/100',
+      'image':
+          'https://i.pinimg.com/736x/16/ea/40/16ea40729954d9f7955c0aa18b5311a7.jpg',
       'type': 'clothing',
     },
     {
       'title': 'Shoes',
-      'image': 'https://via.placeholder.com/100',
+      'image':
+          'https://i.pinimg.com/736x/87/b2/aa/87b2aa1f57fd9b2ac6f9e0d01072b385.jpg',
       'type': 'category',
       'category': 'Shoes',
     },
     {
       'title': 'Accessories',
-      'image': 'https://via.placeholder.com/100',
+      'image':
+          'https://i.pinimg.com/736x/20/f0/05/20f00580fc1b12d6194bb5fc0eb54c53.jpg',
       'type': 'accessories',
     },
   ];
@@ -86,16 +81,18 @@ class SubCategoryScreen extends StatelessWidget {
     'Accessories',
     'Jewelry',
   ];
-  final List<String> aksesuarSubcategoriesKids = [
-    'Watches',
-    'Accessories',
-  ];
+  final List<String> aksesuarSubcategoriesKids = ['Watches', 'Accessories'];
 
   List<String> getSubcategories(String type) {
     final genderLower = gender.toLowerCase();
     final isMale = genderLower.contains('male') || genderLower.contains('man');
-    final isFemale = genderLower.contains('female') || genderLower.contains('woman') || genderLower.contains('kadın') || genderLower.contains('kadin');
-    final isKids = genderLower.contains('kids') || genderLower.contains('çocuk');
+    final isFemale =
+        genderLower.contains('female') ||
+        genderLower.contains('woman') ||
+        genderLower.contains('kadın') ||
+        genderLower.contains('kadin');
+    final isKids =
+        genderLower.contains('kids') || genderLower.contains('çocuk');
 
     if (type == 'clothing') {
       if (isMale) return giyimSubcategoriesMale;
@@ -152,11 +149,12 @@ class SubCategoryScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => SubSubCategoryScreen(
-                      title: item['title'],
-                      subcategories: subcategories,
-                      gender: gender,  // Pass gender here
-                    ),
+                    builder:
+                        (_) => SubSubCategoryScreen(
+                          title: item['title'],
+                          subcategories: subcategories,
+                          gender: gender, // Pass gender here
+                        ),
                   ),
                 );
               } else if (type == 'category') {
@@ -164,10 +162,11 @@ class SubCategoryScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => CategoryScreen(
-                      categoryName: item['category'],
-                      gender: gender, // Pass gender here
-                    ),
+                    builder:
+                        (_) => CategoryScreen(
+                          categoryName: item['category'],
+                          gender: gender, // Pass gender here
+                        ),
                   ),
                 );
               }
