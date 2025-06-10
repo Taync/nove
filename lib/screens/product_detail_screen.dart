@@ -292,31 +292,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             );
                           }).toList(),
                     ),
-                    SizedBox(height: 20),
-                    Text(widget.description, style: TextStyle(fontSize: 16)),
-                    SizedBox(height: 20),
-                    Text(
-                      "Recently Viewed",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    SizedBox(
-                      height: 160,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 5,
-                        itemBuilder:
-                            (_, index) => Container(
-                              width: 120,
-                              margin: EdgeInsets.only(right: 12),
-                              color: Colors.grey[300],
-                              child: Center(child: Text("Product $index")),
-                            ),
-                      ),
-                    ),
                   ],
                 ),
               ),

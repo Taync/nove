@@ -46,7 +46,7 @@ class _AddProductState extends State<AddProduct> {
     'Accessories',
   ];
 
-  final List<String> genderItem = ['Man', 'Women', 'Kids'];
+  final List<String> genderItem = ['Male', 'Female', 'Kids'];
   final List<String> brandItem = [
     'Nike',
     'Adidas',
@@ -65,6 +65,8 @@ class _AddProductState extends State<AddProduct> {
     'Dior',
     'Ralph Lauren',
     'Academia',
+    'Burberry',
+    'Yves SaintLaurent',
   ];
 
   final List<String> colorItem = [
