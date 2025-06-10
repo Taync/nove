@@ -84,12 +84,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Future<void> _checkIfFavourite() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('favourites')
-          .where('productName', isEqualTo: widget.productName)
-          .get();
+      final snapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .collection('favourites')
+              .where('productName', isEqualTo: widget.productName)
+              .get();
 
       setState(() {
         _isFavourite = snapshot.docs.isNotEmpty;
@@ -132,7 +133,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         'color': widget.color,
         'image': widget.images,
         'stock': widget.stock,
-        'brand': widget.brand,  // <-- Added brand here
+        'brand': widget.brand, // <-- Added brand here
         'timestamp': FieldValue.serverTimestamp(),
       });
       setState(() {
@@ -149,7 +150,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final double imageHeight = MediaQuery.of(context).size.height * 0.6;
     final isShoesCategory = widget.category.toLowerCase() == 'shoes';
     final sizeOptions =
-        isShoesCategory ? List<String>.generate(10, (i) => (36 + i).toString()) : ['S', 'M', 'L', 'XL'];
+        isShoesCategory
+            ? List<String>.generate(10, (i) => (36 + i).toString())
+            : ['S', 'M', 'L', 'XL'];
 
     return Scaffold(
       body: CustomScrollView(
@@ -181,7 +184,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       imageBytes,
                       fit: BoxFit.contain,
                       width: double.infinity,
-                      errorBuilder: (_, __, ___) => Icon(Icons.broken_image, size: 150),
+                      errorBuilder:
+                          (_, __, ___) => Icon(Icons.broken_image, size: 150),
                     );
                   } catch (e) {
                     return Center(child: Icon(Icons.error));
@@ -202,7 +206,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     height: 8,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: _currentImageIndex == index ? Colors.black : Colors.grey,
+                      color:
+                          _currentImageIndex == index
+                              ? Colors.black
+                              : Colors.grey,
                     ),
                   ),
                 ),
@@ -261,24 +268,27 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     SizedBox(height: 10),
                     Wrap(
                       spacing: 10,
-                      children: sizeOptions.map((size) {
-                        final isSelected = _selectedSize == size;
-                        return ChoiceChip(
-                          label: Text(size),
-                          selected: isSelected,
-                          onSelected: widget.stock == 0
-                              ? null
-                              : (selected) {
-                                  setState(() {
-                                    _selectedSize = selected ? size : null;
-                                  });
-                                },
-                          selectedColor: Colors.black,
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
-                          ),
-                        );
-                      }).toList(),
+                      children:
+                          sizeOptions.map((size) {
+                            final isSelected = _selectedSize == size;
+                            return ChoiceChip(
+                              label: Text(size),
+                              selected: isSelected,
+                              onSelected:
+                                  widget.stock == 0
+                                      ? null
+                                      : (selected) {
+                                        setState(() {
+                                          _selectedSize =
+                                              selected ? size : null;
+                                        });
+                                      },
+                              selectedColor: Colors.black,
+                              labelStyle: TextStyle(
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
+                            );
+                          }).toList(),
                     ),
                     SizedBox(height: 20),
                     Text(widget.description, style: TextStyle(fontSize: 16)),
@@ -296,12 +306,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: 5,
-                        itemBuilder: (_, index) => Container(
-                          width: 120,
-                          margin: EdgeInsets.only(right: 12),
-                          color: Colors.grey[300],
-                          child: Center(child: Text("Product $index")),
-                        ),
+                        itemBuilder:
+                            (_, index) => Container(
+                              width: 120,
+                              margin: EdgeInsets.only(right: 12),
+                              color: Colors.grey[300],
+                              child: Center(child: Text("Product $index")),
+                            ),
                       ),
                     ),
                   ],
@@ -323,89 +334,100 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton.icon(
-                  onPressed: widget.stock == 0
-                      ? null
-                      : () async {
-                          if (_selectedSize == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Please select a size.")),
-                            );
-                            return;
-                          }
-
-                          final user = FirebaseAuth.instance.currentUser;
-                          if (user == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Please sign in.")),
-                            );
-                            return;
-                          }
-
-                          final cartQuery = await FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(user.uid)
-                              .collection('cart')
-                              .where('productName', isEqualTo: widget.productName)
-                              .where('size', isEqualTo: _selectedSize)
-                              .where('color', isEqualTo: widget.color)
-                              .get();
-
-                          if (cartQuery.docs.isNotEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "This product is already in your cart.",
+                  onPressed:
+                      widget.stock == 0
+                          ? null
+                          : () async {
+                            if (_selectedSize == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Please select a size."),
                                 ),
-                              ),
-                            );
-                            return;
-                          }
+                              );
+                              return;
+                            }
 
-                          try {
-                            await FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(user.uid)
-                                .collection('cart')
-                                .add({
-                              'productName': widget.productName,
-                              'price': widget.price,
-                              'size': _selectedSize,
-                              'color': widget.color,
-                              'image': widget.images,
-                              'timestamp': FieldValue.serverTimestamp(),
-                              'gift': false,
-                              'quantity': 1,
-                            });
+                            final user = FirebaseAuth.instance.currentUser;
+                            if (user == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Please sign in.")),
+                              );
+                              return;
+                            }
 
-                            final cartSnapshot = await FirebaseFirestore.instance
-                                .collection('users')
-                                .doc(user.uid)
-                                .collection('cart')
-                                .get();
+                            final cartQuery =
+                                await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user.uid)
+                                    .collection('cart')
+                                    .where(
+                                      'productName',
+                                      isEqualTo: widget.productName,
+                                    )
+                                    .where('size', isEqualTo: _selectedSize)
+                                    .where('color', isEqualTo: widget.color)
+                                    .get();
 
-                            final cartCount = cartSnapshot.docs.length;
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "You have $cartCount product${cartCount > 1 ? 's' : ''} in your cart.",
+                            if (cartQuery.docs.isNotEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "This product is already in your cart.",
+                                  ),
                                 ),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Failed to add to cart: $e")),
-                            );
-                          }
-                        },
+                              );
+                              return;
+                            }
+
+                            try {
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(user.uid)
+                                  .collection('cart')
+                                  .add({
+                                    'productName': widget.productName,
+                                    'price': widget.price,
+                                    'size': _selectedSize,
+                                    'color': widget.color,
+                                    'image': widget.images,
+                                    'timestamp': FieldValue.serverTimestamp(),
+                                    'gift': false,
+                                    'quantity': 1,
+                                  });
+
+                              final cartSnapshot =
+                                  await FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(user.uid)
+                                      .collection('cart')
+                                      .get();
+
+                              final cartCount = cartSnapshot.docs.length;
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "You have $cartCount product${cartCount > 1 ? 's' : ''} in your cart.",
+                                  ),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Failed to add to cart: $e"),
+                                ),
+                              );
+                            }
+                          },
                   icon: Icon(Icons.add_shopping_cart, color: Colors.white),
                   label: Text(
                     "ADD TO CART",
                     style: TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: widget.stock == 0 ? Colors.grey : Colors.black,
+                    backgroundColor:
+                        widget.stock == 0 ? Colors.grey : Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.zero,
                     ),
@@ -485,3 +507,4 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     }
   }
 }
+//messi

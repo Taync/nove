@@ -6,113 +6,220 @@ import 'package:nove_5/home.dart';
 import 'package:nove_5/screens/MainCategoryScreen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/account_screen.dart';
-import 'package:nove_5/screens/product_detail_screen.dart'; // Import ProductDetailScreen
+import 'package:nove_5/screens/product_detail_screen.dart';
 
-class FavouritesScreen extends StatelessWidget {
+class FavouritesScreen extends StatefulWidget {
+  @override
+  State<FavouritesScreen> createState() => _FavouritesScreenState();
+}
+
+class _FavouritesScreenState extends State<FavouritesScreen> {
   final user = FirebaseAuth.instance.currentUser;
+  Map<String, String> selectedSizes = {};
+
+  void _addToCart(Map<String, dynamic> product, String productId) {
+    final selectedSize = selectedSizes[productId];
+    if (selectedSize == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please select a size.')));
+      return;
+    }
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('cart')
+        .add({
+          'productId': productId,
+          'productName': product['productName'],
+          'price': product['price'],
+          'image': product['image'],
+          'size': selectedSize,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Product added to cart.')));
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Favourites')),
-      body: user == null
-          ? const Center(
-              child: Text("Please sign in to see your favourites."),
-            )
-          : StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(user!.uid)
-                  .collection('favourites')
-                  .orderBy('timestamp', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+      body:
+          user == null
+              ? const Center(child: Text("Please log in to view favourites."))
+              : StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(user!.uid)
+                        .collection('favourites')
+                        .orderBy('timestamp', descending: true)
+                        .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return const Center(
-                    child: Text("You haven't added any favourites yet."),
-                  );
-                }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(
+                      child: Text("You have no favourite products yet."),
+                    );
+                  }
 
-                final favourites = snapshot.data!.docs;
+                  final favourites = snapshot.data!.docs;
 
-                return ListView.separated(
-                  separatorBuilder: (_, __) => const Divider(),
-                  itemCount: favourites.length,
-                  itemBuilder: (context, index) {
-                    final fav = favourites[index];
-                    final data = fav.data() as Map<String, dynamic>;
+                  return ListView.separated(
+                    separatorBuilder: (_, __) => const Divider(),
+                    itemCount: favourites.length,
+                    itemBuilder: (context, index) {
+                      final fav = favourites[index];
+                      final data = fav.data() as Map<String, dynamic>;
+                      final productId = fav.id;
 
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProductDetailScreen(
-                              images: (data['image'] is List)
-                                  ? List<String>.from(data['image'])
-                                  : [data['image'] ?? ''],
-                              productName: data['productName'] ?? '-',
-                              price: data['price'] ?? '-',
-                              description: data['description'] ?? '-',
-                              brand: data['brand'] ?? '-',
-                              category: data['category'] ?? '-',
-                              gender: data['gender'] ?? '-',
-                              color: data['color'] ?? '-',
-                              stock: data['stock'] ?? 0,  // <-- Added stock here
-                            ),
-                          ),
-                        );
-                      },
-                      child: Padding(
+                      List<String> sizes = [];
+                      if ((data['gender'] == 'Male' ||
+                              data['gender'] == 'Female') &&
+                          data['category'] == 'Clothing') {
+                        sizes = ['XS', 'S', 'M', 'L', 'XL'];
+                      } else if (data['category'] == 'Shoes') {
+                        sizes = [
+                          '36',
+                          '37',
+                          '38',
+                          '39',
+                          '40',
+                          '41',
+                          '42',
+                          '43',
+                          '44',
+                        ];
+                      }
+
+                      return Container(
+                        color: Colors.white,
                         padding: const EdgeInsets.all(12),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: _buildFavoriteItemImage(data),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    data['productName'] ?? 'Unnamed',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => ProductDetailScreen(
+                                          images:
+                                              (data['image'] is List)
+                                                  ? List<String>.from(
+                                                    data['image'],
+                                                  )
+                                                  : [data['image'] ?? ''],
+                                          productName:
+                                              data['productName'] ?? '-',
+                                          price: data['price'] ?? '-',
+                                          description:
+                                              data['description'] ?? '-',
+                                          brand: data['brand'] ?? '-',
+                                          category: data['category'] ?? '-',
+                                          gender: data['gender'] ?? '-',
+                                          color: data['color'] ?? '-',
+                                          stock: data['stock'] ?? 0,
+                                        ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "${data['color'] ?? ''} - ${data['price'] ?? ''} ₺",
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: _buildFavoriteItemImage(data),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          data['productName'] ?? 'Unnamed',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          "${data['color'] ?? ''} - ${data['price'] ?? ''} ₺",
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline),
+                                    onPressed: () {
+                                      fav.reference.delete();
+                                    },
                                   ),
                                 ],
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.delete_outline),
-                              onPressed: () {
-                                fav.reference.delete();
-                              },
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                DropdownButton<String>(
+                                  value:
+                                      selectedSizes[productId] != null &&
+                                              sizes.contains(
+                                                selectedSizes[productId],
+                                              )
+                                          ? selectedSizes[productId]
+                                          : null,
+                                  hint: const Text("Select Size"),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedSizes[productId] = value!;
+                                    });
+                                  },
+                                  items:
+                                      sizes
+                                          .map(
+                                            (size) => DropdownMenuItem(
+                                              value: size,
+                                              child: Text(size),
+                                            ),
+                                          )
+                                          .toList(),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.black,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                  ),
+                                  onPressed: () => _addToCart(data, productId),
+                                  child: const Text("Add to Cart"),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+                      );
+                    },
+                  );
+                },
+              ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: 3,
@@ -136,7 +243,7 @@ class FavouritesScreen extends StatelessWidget {
               (route) => false,
             );
           } else if (index == 3) {
-            // Current page, no action needed
+            // Already on Favourites
           } else if (index == 4) {
             Navigator.pushAndRemoveUntil(
               context,
@@ -174,13 +281,13 @@ class FavouritesScreen extends StatelessWidget {
 
 Widget _buildFavoriteItemImage(Map<String, dynamic> data) {
   String imageBase64 = '';
-
-  if (data['image'] != null && data['image'] is List && (data['image'] as List).isNotEmpty) {
-    imageBase64 = data['image'][0]; // first image string from list
+  if (data['image'] != null &&
+      data['image'] is List &&
+      (data['image'] as List).isNotEmpty) {
+    imageBase64 = data['image'][0];
   } else if (data['image'] is String) {
     imageBase64 = data['image'];
   }
-
   try {
     if (imageBase64.isNotEmpty) {
       final imageBytes = base64Decode(imageBase64);
