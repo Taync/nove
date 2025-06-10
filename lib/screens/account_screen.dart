@@ -10,6 +10,7 @@ import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/ordersscreen.dart';
 import 'package:nove_5/screens/theme_provider.dart';
 import 'package:nove_5/screens/themes_screen.dart';
+import 'package:nove_5/screens/account_settings_screen.dart'; // 👈 yeni ekran
 import 'package:provider/provider.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -31,10 +32,11 @@ class _AccountScreenState extends State<AccountScreen> {
   Future<void> fetchUserData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
+      final doc =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
       final data = doc.data();
       if (data != null) {
         setState(() {
@@ -50,7 +52,7 @@ class _AccountScreenState extends State<AccountScreen> {
     await FirebaseAuth.instance.signOut();
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => AuthGate()), // Update this to your LoginPage widget
+      MaterialPageRoute(builder: (context) => AuthGate()),
       (route) => false,
     );
   }
@@ -88,7 +90,7 @@ class _AccountScreenState extends State<AccountScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Section with background
+            // Üst Profil Alanı
             Stack(
               children: [
                 Container(
@@ -138,7 +140,8 @@ class _AccountScreenState extends State<AccountScreen> {
               ],
             ),
             SizedBox(height: 16),
-            // Main Buttons Card
+
+            // Ana Butonlar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Card(
@@ -177,8 +180,11 @@ class _AccountScreenState extends State<AccountScreen> {
                         icon: Icons.settings,
                         label: 'Account Settings',
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Coming soon!')),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const AccountSettingsScreen(),
+                            ),
                           );
                         },
                       ),
@@ -187,9 +193,10 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
               ),
             ),
+
             SizedBox(height: 16),
 
-            // Pushable List Items
+            // Ek Listeler
             _PushableListTile(
               icon: Icons.store,
               label: 'Shops',
@@ -218,6 +225,8 @@ class _AccountScreenState extends State<AccountScreen> {
               },
             ),
             Divider(),
+
+            // Admin Panel ve Temalar
             if (isAdmin)
               _PushableListTile(
                 icon: Icons.admin_panel_settings,
@@ -286,16 +295,17 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 }
 
-// Main Button Widget
 class _MainButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+
   const _MainButton({
     required this.icon,
     required this.label,
     required this.onTap,
   });
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -316,16 +326,17 @@ class _MainButton extends StatelessWidget {
   }
 }
 
-// Pushable ListTile Widget
 class _PushableListTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+
   const _PushableListTile({
     required this.icon,
     required this.label,
     required this.onTap,
   });
+
   @override
   Widget build(BuildContext context) {
     return InkWell(
