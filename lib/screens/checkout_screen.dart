@@ -42,16 +42,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _clearCartAndNavigate() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
       final cartRef = userRef.collection('cart');
       final ordersRef = userRef.collection('orders');
 
       final cartSnapshot = await cartRef.get();
 
       if (cartSnapshot.docs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Your cart is empty.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Your cart is empty.')));
         return;
       }
 
@@ -86,15 +88,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-<<<<<<< HEAD
         SnackBar(
           content: Text(
-            'There was an error, all of the products were removed from your cart!',
+            'The products have been successfully added to your orders.',
           ),
         ),
-=======
-        SnackBar(content: Text('The products have been successfully added to your orders.')),
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
       );
     }
   }
@@ -120,10 +118,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Scaffold(
       appBar: AppBar(title: Text("Checkout")),
       body: SingleChildScrollView(
-<<<<<<< HEAD
-        // This enables scrolling if content overflows
-=======
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -134,14 +128,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Your Name',
                   filled: true,
-<<<<<<< HEAD
                   fillColor:
                       themeProvider.isDarkMode
                           ? Colors.grey[800]
                           : Colors.grey[300],
-=======
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -157,7 +147,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Your Address',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -174,14 +167,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Card Number',
                   filled: true,
-<<<<<<< HEAD
                   fillColor:
                       themeProvider.isDarkMode
                           ? Colors.grey[800]
                           : Colors.grey[300],
-=======
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -200,14 +189,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     decoration: InputDecoration(
                       hintText: 'MM/YY Expiry Date',
                       filled: true,
-<<<<<<< HEAD
                       fillColor:
                           themeProvider.isDarkMode
                               ? Colors.grey[800]
                               : Colors.grey[300],
-=======
-                      fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -226,14 +211,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter CVV',
                   filled: true,
-<<<<<<< HEAD
                   fillColor:
                       themeProvider.isDarkMode
                           ? Colors.grey[800]
                           : Colors.grey[300],
-=======
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,

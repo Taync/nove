@@ -4,13 +4,6 @@ import 'dart:convert';
 import 'product_detail_screen.dart';
 
 class CategoryScreen extends StatefulWidget {
-<<<<<<< HEAD
-  final String categoryName;
-  final String? gender;
-  final String? mainCategory;
-
-  CategoryScreen({required this.categoryName, this.gender, this.mainCategory});
-=======
   final String? categoryName;
   final String? brandName;
   final String? gender;
@@ -23,7 +16,6 @@ class CategoryScreen extends StatefulWidget {
     this.showNewArrivals = false,
     Key? key,
   }) : super(key: key);
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
 
   @override
   _CategoryScreenState createState() => _CategoryScreenState();
@@ -82,27 +74,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-    Query query = FirebaseFirestore.instance.collection('Product');
-
-    query = query.where('category', isEqualTo: widget.categoryName);
-
-    if (widget.gender != null) {
-      query = query.where('gender', isEqualTo: widget.gender);
-    }
-
-    if (widget.mainCategory != null) {
-      query = query.where('mainCategory', isEqualTo: widget.mainCategory);
-    }
-
-    query = query.orderBy('price', descending: _sortOrder == 'desc');
-=======
-    final screenTitle = widget.showNewArrivals
-        ? "New Arrivals"
-        : widget.brandName?.isNotEmpty == true
+    final screenTitle =
+        widget.showNewArrivals
+            ? "New Arrivals"
+            : widget.brandName?.isNotEmpty == true
             ? widget.brandName!
             : widget.categoryName ?? widget.gender ?? "Products";
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
 
     return Scaffold(
       appBar: AppBar(
@@ -115,7 +92,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 _sortOrder = value;
               });
             },
-<<<<<<< HEAD
             itemBuilder:
                 (context) => [
                   PopupMenuItem(
@@ -127,52 +103,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     child: Text('Sort by Price: High to Low'),
                   ),
                 ],
-          ),
-        ],
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: query.snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("No products found in this category."));
-          }
-
-          final products = snapshot.data!.docs;
-
-          return GridView.builder(
-            padding: EdgeInsets.all(8),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.7,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              final name = product['name'] ?? 'Ürün';
-              final price = product['price']?.toString() ?? '0';
-              final imageUrls = product['imageBase64'] ?? [];
-              final description = product['description'] ?? '';
-              final category = product['category'] ?? '';
-              final brand = product['brand'] ?? '';
-              final gender = product['gender'] ?? '';
-              final color = product['color'] ?? '';
-=======
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'asc',
-                child: Text('Sort by Price: Low to High'),
-              ),
-              PopupMenuItem(
-                value: 'desc',
-                child: Text('Sort by Price: High to Low'),
-              ),
-            ],
           ),
         ],
       ),
@@ -189,7 +119,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting)
                   return Center(child: CircularProgressIndicator());
->>>>>>> f974d902222f06d1b59ce31dcc1a13ad946dd49b
 
                 if (snapshot.hasError)
                   return Center(child: Text('Error: ${snapshot.error}'));
@@ -235,17 +164,18 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ProductDetailScreen(
-                              images: base64Images,
-                              productName: name,
-                              price: price,
-                              description: description,
-                              category: category,
-                              brand: brand,
-                              gender: gender,
-                              color: color,
-                              stock: stock,
-                            ),
+                            builder:
+                                (_) => ProductDetailScreen(
+                                  images: base64Images,
+                                  productName: name,
+                                  price: price,
+                                  description: description,
+                                  category: category,
+                                  brand: brand,
+                                  gender: gender,
+                                  color: color,
+                                  stock: stock,
+                                ),
                           ),
                         );
                       },
@@ -261,15 +191,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(8),
                                 ),
-                                child: base64Images.isNotEmpty
-                                    ? Image.memory(
-                                        base64Decode(base64Images[0]),
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        errorBuilder: (_, __, ___) =>
-                                            Icon(Icons.broken_image),
-                                      )
-                                    : Icon(Icons.image_not_supported, size: 50),
+                                child:
+                                    base64Images.isNotEmpty
+                                        ? Image.memory(
+                                          base64Decode(base64Images[0]),
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          errorBuilder:
+                                              (_, __, ___) =>
+                                                  Icon(Icons.broken_image),
+                                        )
+                                        : Icon(
+                                          Icons.image_not_supported,
+                                          size: 50,
+                                        ),
                               ),
                             ),
                             Padding(

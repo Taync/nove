@@ -24,6 +24,7 @@ class _AddBannerCarouselImageState extends State<AddBannerCarouselImage> {
     'Moncler',
     'YvesSaintLaurent',
     'Burberry',
+    'Lacoste',
   ];
 
   Future<void> pickImage() async {
@@ -56,18 +57,18 @@ class _AddBannerCarouselImageState extends State<AddBannerCarouselImage> {
         'isActive': true,
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Banner uploaded successfully")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Banner uploaded successfully")));
 
       setState(() {
         _imageFile = null;
         _selectedBrand = null;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Upload failed: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Upload failed: $e")));
     } finally {
       setState(() => _isUploading = false);
     }
@@ -86,36 +87,36 @@ class _AddBannerCarouselImageState extends State<AddBannerCarouselImage> {
               child: Container(
                 height: 200,
                 color: Colors.grey[300],
-                child: _imageFile != null
-                    ? Image.file(_imageFile!, fit: BoxFit.cover)
-                    : Center(child: Text("Tap to pick image")),
+                child:
+                    _imageFile != null
+                        ? Image.file(_imageFile!, fit: BoxFit.cover)
+                        : Center(child: Text("Tap to pick image")),
               ),
             ),
             SizedBox(height: 20),
             DropdownButtonFormField<String>(
               value: _selectedBrand,
               hint: Text("Select Category"),
-              items: brandItems
-                  .map((cat) => DropdownMenuItem(
-                        child: Text(cat),
-                        value: cat,
-                      ))
-                  .toList(),
+              items:
+                  brandItems
+                      .map(
+                        (cat) => DropdownMenuItem(child: Text(cat), value: cat),
+                      )
+                      .toList(),
               onChanged: (val) {
                 setState(() {
                   _selectedBrand = val;
                 });
               },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(border: OutlineInputBorder()),
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _isUploading ? null : uploadBanner,
-              child: _isUploading
-                  ? CircularProgressIndicator(color: Colors.white)
-                  : Text("Upload Banner"),
+              child:
+                  _isUploading
+                      ? CircularProgressIndicator(color: Colors.white)
+                      : Text("Upload Banner"),
             ),
           ],
         ),
