@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:nove_5/Admin/AdminPanelScreen.dart';
 import 'package:nove_5/LoginPage.dart';
 import 'package:nove_5/home.dart';
+import 'package:nove_5/screens/InformationCenterScreen.dart';
 import 'package:nove_5/screens/MainCategoryScreen.dart';
+import 'package:nove_5/screens/ShopsScreen.dart';
 import 'package:nove_5/screens/cart_screen.dart';
 import 'package:nove_5/screens/favourites_screen.dart';
 import 'package:nove_5/screens/ordersscreen.dart';
@@ -201,27 +203,20 @@ class _AccountScreenState extends State<AccountScreen> {
               icon: Icons.store,
               label: 'Shops',
               onTap: () {
-                ScaffoldMessenger.of(
+                Navigator.push(
                   context,
-                ).showSnackBar(SnackBar(content: Text('Coming soon!')));
-              },
-            ),
-            _PushableListTile(
-              icon: Icons.help_center,
-              label: 'Product',
-              onTap: () {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text('Coming soon!')));
+                  MaterialPageRoute(builder: (_) => ShopsScreen()),
+                );
               },
             ),
             _PushableListTile(
               icon: Icons.info,
               label: 'Information Center',
               onTap: () {
-                ScaffoldMessenger.of(
+                Navigator.push(
                   context,
-                ).showSnackBar(SnackBar(content: Text('Coming soon!')));
+                  MaterialPageRoute(builder: (_) => AboutUsScreen()),
+                );
               },
             ),
             Divider(),
@@ -256,7 +251,7 @@ class _AccountScreenState extends State<AccountScreen> {
             SizedBox(height: 16),
             Center(
               child: Text(
-                'Version: 0.7.5',
+                'Version: 0.9.5',
                 style: TextStyle(color: Colors.grey, fontSize: 13),
               ),
             ),

@@ -64,6 +64,7 @@ class _AddProductState extends State<AddProduct> {
     'Vakko',
     'Dior',
     'Ralph Lauren',
+    'Academia',
   ];
 
   final List<String> colorItem = [

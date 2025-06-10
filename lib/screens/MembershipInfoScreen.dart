@@ -1,4 +1,3 @@
-// ... diğer importlar
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -57,9 +56,9 @@ class _MembershipInfoScreenState extends State<MembershipInfoScreen> {
           .doc(currentUser!.uid)
           .update({'name': fullName, 'phone': phone, 'gender': gender});
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Bilgileriniz güncellendi.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Your information has been updated.')),
+      );
     }
   }
 
@@ -73,7 +72,7 @@ class _MembershipInfoScreenState extends State<MembershipInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Üyelik Bilgilerim")),
+      appBar: AppBar(title: Text("Membership Information")),
       body:
           isLoading
               ? Center(child: CircularProgressIndicator())
@@ -83,15 +82,15 @@ class _MembershipInfoScreenState extends State<MembershipInfoScreen> {
                   key: _formKey,
                   child: ListView(
                     children: [
-                      // İsim ve Soyad Yan Yana
+                      // Name and Surname side by side
                       Row(
                         children: [
                           Expanded(
                             child: TextFormField(
                               initialValue: firstName,
-                              decoration: getTextFieldDecoration('İsim'),
+                              decoration: getTextFieldDecoration('First Name'),
                               validator:
-                                  (val) => val!.isEmpty ? 'Zorunlu' : null,
+                                  (val) => val!.isEmpty ? 'Required' : null,
                               onChanged:
                                   (val) => setState(() => firstName = val),
                             ),
@@ -100,9 +99,9 @@ class _MembershipInfoScreenState extends State<MembershipInfoScreen> {
                           Expanded(
                             child: TextFormField(
                               initialValue: lastName,
-                              decoration: getTextFieldDecoration('Soyad'),
+                              decoration: getTextFieldDecoration('Last Name'),
                               validator:
-                                  (val) => val!.isEmpty ? 'Zorunlu' : null,
+                                  (val) => val!.isEmpty ? 'Required' : null,
                               onChanged:
                                   (val) => setState(() => lastName = val),
                             ),
@@ -111,47 +110,44 @@ class _MembershipInfoScreenState extends State<MembershipInfoScreen> {
                       ),
                       SizedBox(height: 16),
 
-                      // Telefon
                       TextFormField(
                         initialValue: phone,
-                        decoration: getTextFieldDecoration('Telefon Numarası'),
+                        decoration: getTextFieldDecoration('Phone Number'),
                         keyboardType: TextInputType.phone,
                         onChanged: (val) => setState(() => phone = val),
                       ),
                       SizedBox(height: 16),
 
-                      // Email (pasif)
                       TextFormField(
                         initialValue: email,
-                        decoration: getTextFieldDecoration('E-posta'),
+                        decoration: getTextFieldDecoration('E-mail'),
                         enabled: false,
                       ),
                       SizedBox(height: 24),
 
-                      // Cinsiyet
-                      Text("Cinsiyet", style: TextStyle(fontSize: 16)),
+                      Text("Gender", style: TextStyle(fontSize: 16)),
                       Row(
                         children: [
                           Radio<String>(
-                            value: 'Erkek',
+                            value: 'Man',
                             groupValue: gender,
                             onChanged: (val) => setState(() => gender = val!),
                           ),
-                          Text("Erkek"),
+                          Text("Man"),
                           SizedBox(width: 32),
                           Radio<String>(
-                            value: 'Kadın',
+                            value: 'Woman',
                             groupValue: gender,
                             onChanged: (val) => setState(() => gender = val!),
                           ),
-                          Text("Kadın"),
+                          Text("Woman"),
                         ],
                       ),
 
                       SizedBox(height: 32),
                       ElevatedButton(
                         onPressed: updateUserData,
-                        child: Text('Kaydet'),
+                        child: Text('Save'),
                         style: ElevatedButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 14),
                         ),

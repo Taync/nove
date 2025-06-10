@@ -17,7 +17,7 @@ class ProductDetailScreen extends StatefulWidget {
   final String category;
   final String gender;
   final String color;
-  final int stock; // New parameter
+  final int stock; // Yeni parametre
 
   ProductDetailScreen({
     required this.images,
@@ -58,26 +58,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           context,
           MaterialPageRoute(builder: (_) => HomeScreen()),
         );
+        break;
       case 1:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => MainCategoryScreen()),
         );
+        break;
       case 2:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => CartScreen()),
         );
+        break;
       case 3:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => FavouritesScreen()),
         );
+        break;
       case 4:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => AccountScreen()),
         );
+        break;
     }
   }
 
@@ -126,14 +131,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text("Removed from favourites")));
     } else {
-      // UPDATED: Add brand and stock to the favourites document
       await favRef.add({
         'productName': widget.productName,
         'price': widget.price,
         'color': widget.color,
         'image': widget.images,
         'stock': widget.stock,
-        'brand': widget.brand, // <-- Added brand here
+        'brand': widget.brand,
         'timestamp': FieldValue.serverTimestamp(),
       });
       setState(() {
@@ -237,8 +241,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       ),
                     ),
                     SizedBox(height: 10),
-
-                    // Stock status text
                     Text(
                       widget.stock == 0
                           ? "Out of Stock"
@@ -249,7 +251,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         fontSize: 16,
                       ),
                     ),
-
                     SizedBox(height: 20),
                     Row(
                       children: [
@@ -257,9 +258,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           'Color: ',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Text(widget.color),
+                        Text(widget.color), // sadece renk ismi
                       ],
                     ),
+
                     SizedBox(height: 10),
                     Text(
                       "Select Size",
