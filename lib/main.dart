@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:nove_5/loginpage.dart';
 import 'package:provider/provider.dart';
 import 'screens/theme_provider.dart'; // ThemeProvider for managing app themes
-import 'screens/themes_screen.dart'; // Optional: screen to manually change theme
+// Optional: screen to manually change theme
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,10 +26,10 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeProvider.lightTheme,     // Light theme definition
-      darkTheme: ThemeProvider.darkTheme,  // Dark theme definition
-      themeMode: themeProvider.themeMode,  // Apply system/user theme mode
-      home: AuthGate(),                    // This is your login/auth wrapper
+      theme: ThemeProvider.lightTheme, // Light theme definition
+      darkTheme: ThemeProvider.darkTheme, // Dark theme definition
+      themeMode: themeProvider.themeMode, // Apply system/user theme mode
+      home: AuthGate(), // This is your login/auth wrapper
     );
   }
 }

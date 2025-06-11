@@ -74,9 +74,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenTitle = widget.showNewArrivals
-        ? "New Arrivals"
-        : widget.brandName?.isNotEmpty == true
+    final screenTitle =
+        widget.showNewArrivals
+            ? "New Arrivals"
+            : widget.brandName?.isNotEmpty == true
             ? widget.brandName!
             : widget.categoryName ?? widget.gender ?? "Products";
 
@@ -91,16 +92,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 _sortOrder = value;
               });
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'asc',
-                child: Text('Sort by Price: Low to High'),
-              ),
-              PopupMenuItem(
-                value: 'desc',
-                child: Text('Sort by Price: High to Low'),
-              ),
-            ],
+            itemBuilder:
+                (context) => [
+                  PopupMenuItem(
+                    value: 'asc',
+                    child: Text('Sort by Price: Low to High'),
+                  ),
+                  PopupMenuItem(
+                    value: 'desc',
+                    child: Text('Sort by Price: High to Low'),
+                  ),
+                ],
           ),
         ],
       ),
@@ -162,17 +164,18 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ProductDetailScreen(
-                              images: base64Images,
-                              productName: name,
-                              price: price,
-                              description: description,
-                              category: category,
-                              brand: brand,
-                              gender: gender,
-                              color: color,
-                              stock: stock,
-                            ),
+                            builder:
+                                (_) => ProductDetailScreen(
+                                  images: base64Images,
+                                  productName: name,
+                                  price: price,
+                                  description: description,
+                                  category: category,
+                                  brand: brand,
+                                  gender: gender,
+                                  color: color,
+                                  stock: stock,
+                                ),
                           ),
                         );
                       },
@@ -188,15 +191,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(8),
                                 ),
-                                child: base64Images.isNotEmpty
-                                    ? Image.memory(
-                                        base64Decode(base64Images[0]),
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        errorBuilder: (_, __, ___) =>
-                                            Icon(Icons.broken_image),
-                                      )
-                                    : Icon(Icons.image_not_supported, size: 50),
+                                child:
+                                    base64Images.isNotEmpty
+                                        ? Image.memory(
+                                          base64Decode(base64Images[0]),
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          errorBuilder:
+                                              (_, __, ___) =>
+                                                  Icon(Icons.broken_image),
+                                        )
+                                        : Icon(
+                                          Icons.image_not_supported,
+                                          size: 50,
+                                        ),
                               ),
                             ),
                             Padding(

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -43,16 +42,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _clearCartAndNavigate() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+      final userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
       final cartRef = userRef.collection('cart');
       final ordersRef = userRef.collection('orders');
 
       final cartSnapshot = await cartRef.get();
 
       if (cartSnapshot.docs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Your cart is empty.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Your cart is empty.')));
         return;
       }
 
@@ -87,7 +88,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('The products have been successfully added to your orders.')),
+        SnackBar(
+          content: Text(
+            'The products have been successfully added to your orders.',
+          ),
+        ),
       );
     }
   }
@@ -123,7 +128,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Your Name',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -139,7 +147,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Your Address',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -156,7 +167,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter Card Number',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -175,7 +189,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     decoration: InputDecoration(
                       hintText: 'MM/YY Expiry Date',
                       filled: true,
-                      fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                      fillColor:
+                          themeProvider.isDarkMode
+                              ? Colors.grey[800]
+                              : Colors.grey[300],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -194,7 +211,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 decoration: InputDecoration(
                   hintText: 'Enter CVV',
                   filled: true,
-                  fillColor: themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                  fillColor:
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,

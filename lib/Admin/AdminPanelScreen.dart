@@ -9,14 +9,19 @@ import 'UserManagementScreen.dart';
 
 class AdminPanelScreen extends StatelessWidget {
   final List<_AdminPanelItem> items = [
-  _AdminPanelItem(Icons.add_box, "Add Product", AddProduct()),
-  _AdminPanelItem(Icons.edit, "Manage Products", EditProductsScreen()), // ← add this line
-  _AdminPanelItem(Icons.category, "Category Management", CategoryManagementScreen()),
-  _AdminPanelItem(Icons.image, "Banner Management", BannerManagementScreen()),
-  _AdminPanelItem(Icons.shopping_cart, "Order Management", OrderManagementScreen()),
-  _AdminPanelItem(Icons.people, "User Management", UserManagementScreen()),
-];
-
+    _AdminPanelItem(Icons.add_box, "Add Product", AddProduct()),
+    _AdminPanelItem(
+      Icons.edit,
+      "Manage Products",
+      EditProductsScreen(),
+    ), // ← add this line
+    _AdminPanelItem(Icons.image, "Banner Management", BannerManagementScreen()),
+    _AdminPanelItem(
+      Icons.shopping_cart,
+      "Order Management",
+      OrderManagementScreen(),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {

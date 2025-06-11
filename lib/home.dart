@@ -47,12 +47,16 @@ class _HomeScreenState extends State<HomeScreen> {
               child: TextField(
                 decoration: InputDecoration(
                   hintText: 'Search For Brand,Category',
-                  prefixIcon: Icon(Icons.search,
-                      color:
-                          themeProvider.isDarkMode ? Colors.white : Colors.grey),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color:
+                        themeProvider.isDarkMode ? Colors.white : Colors.grey,
+                  ),
                   filled: true,
                   fillColor:
-                      themeProvider.isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                      themeProvider.isDarkMode
+                          ? Colors.grey[800]
+                          : Colors.grey[300],
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
@@ -79,12 +83,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color:
-                            themeProvider.isDarkMode ? Colors.white : Colors.black,
+                            themeProvider.isDarkMode
+                                ? Colors.white
+                                : Colors.black,
                       ),
                     ),
                   ),
                   Divider(
-                    color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                    color:
+                        themeProvider.isDarkMode ? Colors.white : Colors.black,
                     thickness: 2,
                   ),
                 ],
@@ -121,7 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         backgroundColor: themeProvider.isDarkMode ? Colors.black : Colors.white,
-        selectedItemColor: themeProvider.isDarkMode ? Colors.white : Colors.black,
+        selectedItemColor:
+            themeProvider.isDarkMode ? Colors.white : Colors.black,
         unselectedItemColor:
             themeProvider.isDarkMode ? Colors.grey : Colors.black54,
         items: const [
@@ -168,38 +176,41 @@ class _BannerCarouselState extends State<BannerCarousel> {
     _pageController = PageController(initialPage: _currentIndex);
     fetchBanners();
   }
-Future<void> fetchBanners() async {
-  final querySnapshot = await FirebaseFirestore.instance
-      .collection('BannerImages')
-      .where('isActive', isEqualTo: true)  // <-- Add this filter
-      .get();
 
-  final loadedBanners = querySnapshot.docs.map((doc) {
-    final data = doc.data();
-    return {
-      'BannerImage': data['BannerImage'] as String? ?? '',
-      'brand': data['brand'] as String? ?? '',
-    };
-  }).toList();
+  Future<void> fetchBanners() async {
+    final querySnapshot =
+        await FirebaseFirestore.instance
+            .collection('BannerImages')
+            .where('isActive', isEqualTo: true) // <-- Add this filter
+            .get();
 
-  if (mounted) {
-    setState(() {
-      banners = loadedBanners;
-    });
+    final loadedBanners =
+        querySnapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'BannerImage': data['BannerImage'] as String? ?? '',
+            'brand': data['brand'] as String? ?? '',
+          };
+        }).toList();
 
-    if (banners.isNotEmpty) {
-      _timer?.cancel();
-      _timer = Timer.periodic(Duration(seconds: 7), (timer) {
-        _currentIndex = (_currentIndex + 1) % banners.length;
-        _pageController.animateToPage(
-          _currentIndex,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
+    if (mounted) {
+      setState(() {
+        banners = loadedBanners;
       });
+
+      if (banners.isNotEmpty) {
+        _timer?.cancel();
+        _timer = Timer.periodic(Duration(seconds: 7), (timer) {
+          _currentIndex = (_currentIndex + 1) % banners.length;
+          _pageController.animateToPage(
+            _currentIndex,
+            duration: Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        });
+      }
     }
   }
-}  
 
   @override
   void dispose() {
@@ -220,7 +231,7 @@ Future<void> fetchBanners() async {
     return Column(
       children: [
         SizedBox(
-          height: 380,
+          height: 480,
           child: PageView.builder(
             controller: _pageController,
             itemCount: banners.length,
@@ -252,22 +263,23 @@ Future<void> fetchBanners() async {
                     );
                   }
                 },
-                child: imageBytes != null
-                    ? Image.memory(
-                        imageBytes,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      )
-                    : Container(
-                        color: Colors.grey[300],
-                        child: Center(
-                          child: Icon(
-                            Icons.broken_image,
-                            size: 50,
-                            color: Colors.grey[700],
+                child:
+                    imageBytes != null
+                        ? Image.memory(
+                          imageBytes,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        )
+                        : Container(
+                          color: Colors.grey[300],
+                          child: Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 50,
+                              color: Colors.grey[700],
+                            ),
                           ),
                         ),
-                      ),
               );
             },
           ),
@@ -283,9 +295,10 @@ Future<void> fetchBanners() async {
               height: 8,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _currentIndex == index
-                    ? Colors.black
-                    : Color.fromARGB(255, 178, 178, 178),
+                color:
+                    _currentIndex == index
+                        ? Colors.black
+                        : Color.fromARGB(255, 178, 178, 178),
               ),
             ),
           ),
@@ -298,7 +311,6 @@ Future<void> fetchBanners() async {
 class ProductHorizontalList extends StatelessWidget {
   final String searchQuery;
   ProductHorizontalList({required this.searchQuery});
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -316,17 +328,21 @@ class ProductHorizontalList extends StatelessWidget {
 
           final allProducts = snapshot.data!.docs;
 
-          final filteredProducts = allProducts.where((product) {
-            final name = product['name']?.toString().toLowerCase() ?? '';
-            final brand = product['brand']?.toString().toLowerCase() ?? '';
-            final category = product['category']?.toString().toLowerCase() ?? '';
-            return name.contains(searchQuery) ||
-                brand.contains(searchQuery) ||
-                category.contains(searchQuery);
-          }).toList();
+          final filteredProducts =
+              allProducts.where((product) {
+                final name = product['name']?.toString().toLowerCase() ?? '';
+                final brand = product['brand']?.toString().toLowerCase() ?? '';
+                final category =
+                    product['category']?.toString().toLowerCase() ?? '';
+                return name.contains(searchQuery) ||
+                    brand.contains(searchQuery) ||
+                    category.contains(searchQuery);
+              }).toList();
 
           if (filteredProducts.isEmpty) {
-            return Center(child: Text("No products found for \"$searchQuery\"."));
+            return Center(
+              child: Text("No products found for \"$searchQuery\"."),
+            );
           }
 
           return ListView.builder(
@@ -348,24 +364,25 @@ class ProductHorizontalList extends StatelessWidget {
               final brand = product['brand'] ?? '';
               final category = product['category'] ?? '';
               final gender = product['gender'] ?? '';
-              final stock = product['stock'] ?? 0;  // Get stock or default 0
+              final stock = product['stock'] ?? 0; // Get stock or default 0
 
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProductDetailScreen(
-                        images: imageList,
-                        productName: name,
-                        price: price,
-                        description: description,
-                        category: category,
-                        brand: brand,
-                        gender: gender,
-                        color: '',
-                        stock: stock,  // pass the required parameter here
-                      ),
+                      builder:
+                          (context) => ProductDetailScreen(
+                            images: imageList,
+                            productName: name,
+                            price: price,
+                            description: description,
+                            category: category,
+                            brand: brand,
+                            gender: gender,
+                            color: '',
+                            stock: stock, // pass the required parameter here
+                          ),
                     ),
                   );
                 },
@@ -382,16 +399,19 @@ class ProductHorizontalList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: imageList.isNotEmpty
-                              ? Image.memory(
-                                  base64Decode(imageList[0]),
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Center(child: Icon(Icons.broken_image));
-                                  },
-                                )
-                              : Center(child: Icon(Icons.broken_image)),
+                          child:
+                              imageList.isNotEmpty
+                                  ? Image.memory(
+                                    base64Decode(imageList[0]),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(
+                                        child: Icon(Icons.broken_image),
+                                      );
+                                    },
+                                  )
+                                  : Center(child: Icon(Icons.broken_image)),
                         ),
                         Padding(
                           padding: EdgeInsets.all(8),
@@ -411,7 +431,7 @@ class ProductHorizontalList extends StatelessWidget {
                               ),
                               SizedBox(height: 4),
                               Text(
-                                "\₺$price",
+                                "₺$price",
                                 style: TextStyle(
                                   color: Colors.green,
                                   fontWeight: FontWeight.bold,

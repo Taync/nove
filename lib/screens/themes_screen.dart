@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'theme_provider.dart'; // Import ThemeProvider
+import 'theme_provider.dart';
 
 class ThemesScreen extends StatelessWidget {
   @override
@@ -8,45 +8,44 @@ class ThemesScreen extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final currentMode = themeProvider.themeMode;
 
+    bool isDarkMode = currentMode == ThemeMode.dark;
+    bool isSystem = currentMode == ThemeMode.system;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Themes'),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                themeProvider.toggleTheme(true); // Switch to dark
+      appBar: AppBar(title: Text('Themes')),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Dark Mode", style: TextStyle(fontSize: 18)),
+            Switch(
+              value: isDarkMode,
+              onChanged: (value) {
+                themeProvider.toggleTheme(value); // true = dark, false = light
               },
-              child: const Text("Switch to Dark Mode"),
             ),
-          ),
-          const SizedBox(height: 20),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                themeProvider.toggleTheme(false); // Switch to light
+            SizedBox(height: 24),
+            Text("System Theme", style: TextStyle(fontSize: 18)),
+            Switch(
+              value: isSystem,
+              onChanged: (value) {
+                if (value) {
+                  themeProvider.setThemeMode(ThemeMode.system);
+                } else {
+                  themeProvider.setThemeMode(
+                    ThemeMode.light,
+                  ); // Default fallback
+                }
               },
-              child: const Text("Switch to Light Mode"),
             ),
-          ),
-          const SizedBox(height: 20),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                themeProvider.setThemeMode(ThemeMode.system); // Use system theme
-              },
-              child: const Text("Match System Theme"),
+            SizedBox(height: 40),
+            Text(
+              'Current Mode: ${_getReadableTheme(currentMode)}',
+              style: TextStyle(fontSize: 16),
             ),
-          ),
-          const SizedBox(height: 40),
-          Text(
-            'Current Mode: ${_getReadableTheme(currentMode)}',
-            style: TextStyle(fontSize: 16),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
