@@ -365,6 +365,7 @@ class ProductHorizontalList extends StatelessWidget {
               final category = product['category'] ?? '';
               final gender = product['gender'] ?? '';
               final stock = product['stock'] ?? 0; // Get stock or default 0
+              final color = product['color'] ?? 'Black';
 
               return GestureDetector(
                 onTap: () {
@@ -380,7 +381,7 @@ class ProductHorizontalList extends StatelessWidget {
                             category: category,
                             brand: brand,
                             gender: gender,
-                            color: '',
+                            color: color,
                             stock: stock, // pass the required parameter here
                           ),
                     ),

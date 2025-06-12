@@ -27,11 +27,12 @@ class _CartScreenState extends State<CartScreen> {
   Future<void> _fetchCartCount() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final cartSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('cart')
-          .get();
+      final cartSnapshot =
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .collection('cart')
+              .get();
       setState(() {
         _cartCount = cartSnapshot.docs.length;
       });
@@ -43,9 +44,7 @@ class _CartScreenState extends State<CartScreen> {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Please Sign In.')),
-      );
+      return const Scaffold(body: Center(child: Text('Please Sign In.')));
     }
 
     return Scaffold(
@@ -54,12 +53,13 @@ class _CartScreenState extends State<CartScreen> {
         automaticallyImplyLeading: false,
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('cart')
-            .orderBy('timestamp', descending: true)
-            .snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .collection('cart')
+                .orderBy('timestamp', descending: true)
+                .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
@@ -101,27 +101,29 @@ class _CartScreenState extends State<CartScreen> {
                     String size = data['size'] ?? '-';
                     bool gift = data['gift'] ?? false;
                     int quantity = data['quantity'] ?? 1;
-                    int stock = data['stock'] ?? 0;  // NEW: stock field
+                    int stock = data['stock'] ?? 0; // NEW: stock field
 
                     return InkWell(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ProductDetailScreen(
-                              images: (data['image'] is List)
-                                  ? List<String>.from(data['image'])
-                                  : [data['image'] ?? ''],
-                              productName: data['productName'] ?? '-',
-                              price: data['price'] ?? '-',
-                              description: data['description'] ?? '-',
-                              brand: data['brand'] ?? '-',
-                              category: data['category'] ?? '-',
-                              gender: data['gender'] ?? '-',
-                              color: color,
-                              stock: data['stock'] ?? 0, // <-- add this line
-                            ),
-                          ),
+                            builder:
+                                (_) => ProductDetailScreen(
+                                  images:
+                                      (data['image'] is List)
+                                          ? List<String>.from(data['image'])
+                                          : [data['image'] ?? ''],
+                                  productName: data['productName'] ?? '-',
+                                  price: data['price'] ?? '-',
+                                  description: data['description'] ?? '-',
+                                  brand: data['brand'] ?? '',
+                                  category: data['category'] ?? '-',
+                                  gender: data['gender'] ?? '-',
+                                  color: color,
+                                  stock: data['stock'] ?? 0, // <-- add this line
+                                ),
+                        ),
                         );
                       },
                       child: Padding(
@@ -166,55 +168,77 @@ class _CartScreenState extends State<CartScreen> {
                                     children: [
                                       const Text(
                                         "Quantity",
-                                        style:
-                                            TextStyle(fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                       const SizedBox(width: 8),
                                       Container(
                                         decoration: BoxDecoration(
-                                          border: Border.all(color: Colors.grey),
-                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: Colors.grey,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
                                         child: Row(
                                           children: [
                                             IconButton(
-                                              icon:
-                                                  const Icon(Icons.remove, size: 20),
-                                              onPressed: quantity > 1
-                                                  ? () {
-                                                      item.reference.update({
-                                                        'quantity': quantity - 1,
-                                                      });
-                                                    }
-                                                  : null,
+                                              icon: const Icon(
+                                                Icons.remove,
+                                                size: 20,
+                                              ),
+                                              onPressed:
+                                                  quantity > 1
+                                                      ? () {
+                                                        item.reference.update({
+                                                          'quantity':
+                                                              quantity - 1,
+                                                        });
+                                                      }
+                                                      : null,
                                             ),
                                             Text(
                                               '$quantity',
                                               style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                             IconButton(
-                                              icon: const Icon(Icons.add, size: 20),
-                                              onPressed: quantity < stock // check stock here
-                                                  ? () {
-                                                      item.reference.update({
-                                                        'quantity': quantity + 1,
-                                                      });
-                                                    }
-                                                  : null,
+                                              icon: const Icon(
+                                                Icons.add,
+                                                size: 20,
+                                              ),
+                                              onPressed:
+                                                  quantity <
+                                                          stock // check stock here
+                                                      ? () {
+                                                        item.reference.update({
+                                                          'quantity':
+                                                              quantity + 1,
+                                                        });
+                                                      }
+                                                      : null,
                                             ),
                                           ],
                                         ),
                                       ),
                                       const SizedBox(width: 12),
-                                      Text(
-                                        stock > 0
-                                            ? 'In stock: $stock'
-                                            : 'Out of stock',
-                                        style: TextStyle(
-                                          color: stock > 0 ? Colors.green : Colors.red,
-                                          fontWeight: FontWeight.bold,
+                                      Flexible(
+                                        child: Text(
+                                          stock > 0
+                                              ? 'In stock: $stock'
+                                              : 'Out of stock',
+                                          style: TextStyle(
+                                            color:
+                                                stock > 0
+                                                    ? Colors.green
+                                                    : Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
@@ -292,7 +316,8 @@ class _CartScreenState extends State<CartScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text(
-                                'Some items exceed available stock. Please adjust quantity.'),
+                              'Some items exceed available stock. Please adjust quantity.',
+                            ),
                           ),
                         );
                         return;
@@ -403,8 +428,11 @@ class _CartScreenState extends State<CartScreen> {
           width: 100,
           height: 100,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) =>
-              Container(color: Colors.grey[300], child: const Icon(Icons.broken_image)),
+          errorBuilder:
+              (_, __, ___) => Container(
+                color: Colors.grey[300],
+                child: const Icon(Icons.broken_image),
+              ),
         );
       } else if (data['image'] is String) {
         final bytes = base64Decode(data['image']);
@@ -413,8 +441,11 @@ class _CartScreenState extends State<CartScreen> {
           width: 100,
           height: 100,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) =>
-              Container(color: Colors.grey[300], child: const Icon(Icons.broken_image)),
+          errorBuilder:
+              (_, __, ___) => Container(
+                color: Colors.grey[300],
+                child: const Icon(Icons.broken_image),
+              ),
         );
       }
     } catch (e) {

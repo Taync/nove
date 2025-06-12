@@ -100,122 +100,75 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                       }
 
                       return Container(
-                        color: Colors.white,
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => ProductDetailScreen(
-                                          images:
-                                              (data['image'] is List)
-                                                  ? List<String>.from(
-                                                    data['image'],
-                                                  )
-                                                  : [data['image'] ?? ''],
-                                          productName:
-                                              data['productName'] ?? '-',
-                                          price: data['price'] ?? '-',
-                                          description:
-                                              data['description'] ?? '-',
-                                          brand: data['brand'] ?? '-',
-                                          category: data['category'] ?? '-',
-                                          gender: data['gender'] ?? '-',
-                                          color: data['color'] ?? '-',
-                                          stock: data['stock'] ?? 0,
-                                        ),
-                                  ),
-                                );
-                              },
-                              child: Row(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: _buildFavoriteItemImage(data),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          data['productName'] ?? 'Unnamed',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "${data['color'] ?? ''} - ${data['price'] ?? ''} ₺",
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete_outline),
-                                    onPressed: () {
-                                      fav.reference.delete();
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                DropdownButton<String>(
-                                  value:
-                                      selectedSizes[productId] != null &&
-                                              sizes.contains(
-                                                selectedSizes[productId],
-                                              )
-                                          ? selectedSizes[productId]
-                                          : null,
-                                  hint: const Text("Select Size"),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedSizes[productId] = value!;
-                                    });
-                                  },
-                                  items:
-                                      sizes
-                                          .map(
-                                            (size) => DropdownMenuItem(
-                                              value: size,
-                                              child: Text(size),
-                                            ),
-                                          )
-                                          .toList(),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.black,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                  ),
-                                  onPressed: () => _addToCart(data, productId),
-                                  child: const Text("Add to Cart"),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
+  color: Colors.white,
+  padding: const EdgeInsets.all(12),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ProductDetailScreen(
+                images: (data['image'] is List)
+                    ? List<String>.from(data['image'])
+                    : [data['image'] ?? ''],
+                productName: data['productName'] ?? '-',
+                price: data['price'] ?? '-',
+                description: data['description'] ?? '-',
+                brand: data['brand'] ?? '-',
+                category: data['category'] ?? '-',
+                gender: data['gender'] ?? '-',
+                color: data['color'] ?? '-',
+                stock: data['stock'] ?? 0,
+              ),
+            ),
+          );
+        },
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: _buildFavoriteItemImage(data),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    data['productName'] ?? 'Unnamed',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "${data['color'] ?? ''} - ${data['price'] ?? ''} ₺",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () {
+                fav.reference.delete();
+              },
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+);
+
                     },
                   );
                 },

@@ -114,8 +114,12 @@ class OrdersScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final order = orders[index].data() as Map<String, dynamic>;
 
-              final productInfo = order['product'] as Map<String, dynamic>? ?? order;
-              final itemName = productInfo['name'] ?? productInfo['title'] ?? 'Unnamed Product';
+              final productInfo = order['Product'] as Map<String, dynamic>? ?? order;
+              final String itemName = productInfo['name'] 
+    ?? productInfo['title'] 
+    ?? order['productName'] 
+    ?? order['title'] 
+    ?? 'Unnamed Product';
 
               final rawPrice = productInfo['price'] ?? order['price'];
               final price = rawPrice is num
@@ -134,7 +138,7 @@ class OrdersScreen extends StatelessWidget {
                   : 'Unknown Date';
 
               List<String> imageList = [];
-              final imagesData = productInfo['imageBase64'] ?? order['imageBase64'];
+              final imagesData = productInfo['image'] ?? order['imageBase64'];
 
               if (imagesData != null) {
                 if (imagesData is List) {
